@@ -343,3 +343,37 @@ $myMoney = new Money(1000, "JPY");
 $allowance = new Money(3000, "JPY");
 $result = $myMoney->add($allowance);
 echo $result->getAmount() . "\n";
+
+/**
+ * 値オブジェクトを使うモチベーション
+ * 1. 表現力を増す
+ */
+
+// プリミティブな値を利用した製造番号
+// これだと処理の途中で以下を見つけたときに一目で内容がわからないため、定義元を探しに行くことになる
+$model_number = "a20421-100-1";
+
+// 値オブジェクトを利用した製造番号
+// クラスを見れば構成要素が何であるかが一目でわかる(自己文章化)
+class ModelNumber
+{
+    private readonly string $product_code;
+    private readonly string $branch;
+    private readonly string $lot;
+
+    public function __construct(string $product_code, string $branch, string $lot)
+    {
+        if ($product_code === null) throw new InvalidArgumentException("製品コードは必須です");
+        if ($branch === null) throw new InvalidArgumentException("枝番は必須です");
+        if ($lot === null) throw new InvalidArgumentException("ロット番号は必須です");
+
+        $this->product_code = $product_code;
+        $this->branch = $branch;
+        $this->lot = $lot;
+    }
+
+    public function toString(): string
+    {
+        return $this->product_code . "=" . $this->branch . "=" . $this->lot;
+    }
+}
