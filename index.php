@@ -303,3 +303,43 @@ class FullName5 implements IEquatable
             && $this->last_name === $other->last_name;
     }
 }
+
+// 量と通過単位を持つお金オブジェクト
+class Money
+{
+    private readonly int $amount;
+    private readonly string $currency;
+
+    public function __construct(int $amount, string $currency)
+    {
+        if ($currency === null) throw new InvalidArgumentException("通貨は必須です");
+        $this->amount = $amount;
+        $this->currency = $currency;
+    }
+
+    public function getAmount(): int
+    {
+        return $this->amount;
+    }
+
+    public function getCurrency(): string
+    {
+        return $this->currency;
+    }
+
+    // 値オブジェクトはデータを保持するコンテナではなく、ふるまいを持つことができるオブジェクト
+    // 金銭の加算処理の実装例
+    public function add(Money $arg): Money
+    {
+        if ($arg === null) throw new InvalidArgumentException("加算する金額が必要です");
+        if ($this->currency !== $arg->currency) throw new InvalidArgumentException("通貨が異なります");
+
+        // 値オブジェクトは不変であるため、計算を行った結果は新しいインスタンスとして返す
+        return new Money($this->amount + $arg->amount, $this->currency);
+    }
+}
+
+$myMoney = new Money(1000, "JPY");
+$allowance = new Money(3000, "JPY");
+$result = $myMoney->add($allowance);
+echo $result->getAmount() . "\n";
