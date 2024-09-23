@@ -105,9 +105,9 @@ interface IEquatable
 
 class FullName2 implements IEquatable
 {
-    private string $first_name;
-    private string $middle_name;
-    private string $last_name;
+    private readonly string $first_name;
+    private readonly string $middle_name;
+    private readonly string $last_name;
 
     public function __construct(string $first_name, string $middle_name = null, string $last_name)
     {
