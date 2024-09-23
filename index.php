@@ -251,3 +251,55 @@ class FullName4 implements IEquatable
             && $this->last_name === $other->last_name;
     }
 }
+
+// もし姓と名を値オブジェクトにするならば、次に考えるべきは「姓と名を分けるかどうか」
+// 別物として取り扱う必要がなければ以下のようになる
+class Name
+{
+    private readonly string $value;
+
+    public function __construct(string $value)
+    {
+        if ($value === null) throw new InvalidArgumentException("名前は必須です");
+        if (!preg_match("/^[a-zA-Z]+$/", $value)) throw new InvalidArgumentException("許可されていない文字が使われています");
+
+        $this->value = $value;
+    }
+
+    public function getValue(): string
+    {
+        return $this->value;
+    }
+}
+
+class FullName5 implements IEquatable
+{
+    private readonly Name $first_name;
+    private readonly Name $last_name;
+
+    public function __construct(Name $first_name, Name $last_name)
+    {
+        if ($first_name === null) throw new InvalidArgumentException("名は必須です");
+        if ($last_name === null) throw new InvalidArgumentException("姓は必須です");
+
+        $this->first_name = $first_name;
+        $this->last_name = $last_name;
+    }
+
+    public function getFirstName(): string
+    {
+        return $this->first_name->getValue();
+    }
+
+    public function getLastName(): string
+    {
+        return $this->last_name->getValue();
+    }
+
+    public function equals(object $other): bool
+    {
+        return $other instanceof FullName5
+            && $this->first_name === $other->first_name
+            && $this->last_name === $other->last_name;
+    }
+}
