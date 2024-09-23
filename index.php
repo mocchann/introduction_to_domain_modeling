@@ -389,7 +389,7 @@ $userName = "me";
 if (mb_strlen($userName) >= 3) {
     // 正常な値なので処理する
 } else {
-    throw new Exception("ユーザー名は3文字以上である必要があります");
+    // throw new Exception("ユーザー名は3文字以上である必要があります");
 }
 
 // 値オブジェクトをうまく利用すれば異常な値の存在を防げる
@@ -409,4 +409,93 @@ class UserName
     {
         return $this->value;
     }
+}
+
+/**
+ * 値オブジェクトを使うモチベーション
+ * 3. 誤った代入を防ぐ
+ */
+
+// 単純な代入を行うコード
+// このコードをみただけだと、user->idにnameが代入される処理に正当性があるのかわからない
+class User
+{
+    public $id;
+}
+
+function createUser(string $name): User
+{
+    $user = new User();
+    $user->id = $name;
+    return $user;
+}
+
+// 値オブジェクトを利用して、自己文章化を進める
+class UserId
+{
+    private readonly string $value;
+
+    public function __construct(string $value)
+    {
+        if ($value === null) throw new InvalidArgumentException("ユーザーIDは必須です");
+
+        $this->value = $value;
+    }
+
+    public function getValue(): string
+    {
+        return $this->value;
+    }
+}
+
+class UserName2
+{
+    private readonly string $value;
+
+    public function __construct(string $value)
+    {
+        if ($value === null) throw new InvalidArgumentException("ユーザー名は必須です");
+
+        $this->value = $value;
+    }
+
+    public function getValue(): string
+    {
+        return $this->value;
+    }
+}
+
+// 値オブジェクトを利用するようにしたUserクラス
+class User2
+{
+    public UserId $id;
+    public UserName2 $name;
+
+    public function getId(): UserId
+    {
+        return $this->id;
+    }
+
+    public function setId(UserId $id): void
+    {
+        $this->id = $id;
+    }
+
+    public function getName(): UserName2
+    {
+        return $this->name;
+    }
+
+    public function setName(UserName2 $name): void
+    {
+        $this->name = $name;
+    }
+}
+
+// このようにすることで、代入時に型が違うとエラーが出る
+function createUser2(UserName2 $name): User2
+{
+    $user = new User2();
+    $user->id = $name; // TypeErrorが出る(静的型付け言語ならランタイムでなく、コンパイルエラーが出るがphpなので仕方なし。。)
+    return $user;
 }
