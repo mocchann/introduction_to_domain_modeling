@@ -141,3 +141,73 @@ class FullName2 implements IEquatable
 
 $name_A = new FullName2("masanobu", "taro", "naruse");
 $name_A->equals(new FullName2("john", "harman", "smith"));
+
+class FullName3 implements IEquatable
+{
+    private readonly FirstName $first_name;
+    private readonly LastName $last_name;
+
+    public function __construct(FirstName $first_name, LastName $last_name)
+    {
+        $this->first_name = $first_name;
+        $this->last_name = $last_name;
+    }
+
+    public function getFirstName(): string
+    {
+        return $this->first_name->getValue();
+    }
+
+    public function getLastName(): string
+    {
+        return $this->last_name->getValue();
+    }
+
+    public function equals(object $other): bool
+    {
+        return $other instanceof FullName3
+            && $this->first_name === $other->first_name
+            && $this->last_name === $other->last_name;
+    }
+}
+
+class FirstName
+{
+    private readonly string $value;
+
+    public function __construct(string $value)
+    {
+        if (empty($value) || is_null($value)) throw new InvalidArgumentException("1文字以上である必要があります");
+        $this->value = $value;
+    }
+
+    public function getValue(): string
+    {
+        return $this->value;
+    }
+}
+
+class LastName
+{
+    private readonly string $value;
+
+    public function __construct(string $value)
+    {
+        if (empty($value) || is_null($value)) throw new InvalidArgumentException("1文字以上である必要があります");
+        $this->value = $value;
+    }
+
+    public function getValue(): string
+    {
+        return $this->value;
+    }
+}
+
+/**
+ * 姓や名まで値オブジェクトにするのは正しいとも間違いとも言えない
+ * 筆者の判断基準としては
+ * 1. そこにルールが存在しているか
+ * 2. それを単体で取り扱いたいか
+ * 氏名だと、姓と名で構成されるルールがあり、単体で取り扱っているため値オブジェクトにする
+ * 姓 or 名の場合、現在時点でシステム上の制約はないため、値オブジェクトにする必要はないと判断する
+ */
