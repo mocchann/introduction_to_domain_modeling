@@ -38,3 +38,8 @@ class FullName
         return $this->last_name;
     }
 }
+
+// FullNameは氏名を表現したオブジェクトで値の表現
+// FullNameクラスに渡す引数さえ間違えなければ、確実に姓を取得できる
+$full_name = new FullName("john", "smith");
+echo $full_name->getLastName() . "\n";
