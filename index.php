@@ -138,3 +138,6 @@ class FullName2 implements IEquatable
             && $this->middle_name === $other->middle_name;
     }
 }
+
+$name_A = new FullName2("masanobu", "taro", "naruse");
+$name_A->equals(new FullName2("john", "harman", "smith"));
