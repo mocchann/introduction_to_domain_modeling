@@ -106,9 +106,10 @@ interface IEquatable
 class FullName2 implements IEquatable
 {
     private string $first_name;
+    private string $middle_name;
     private string $last_name;
 
-    public function __construct(string $first_name, string $last_name)
+    public function __construct(string $first_name, string $middle_name = null, string $last_name)
     {
         $this->first_name = $first_name;
         $this->last_name = $last_name;
@@ -129,6 +130,11 @@ class FullName2 implements IEquatable
         if (!($other instanceof FullName2)) return false;
         if ($other === null) return false;
         if ($this === $other) return true;
-        return $this->first_name === $other->first_name && $this->last_name === $other->last_name;
+        return $this->first_name === $other->first_name
+            && $this->last_name === $other->last_name
+            // 値オブジェクトを用意しておけば、条件を追加するときも以下の1行で済む
+            // シンプルな条件分岐のロジックでは、リポジトリ全体で同じような処理が他にもないか確認 & 全箇所修正が必要になるが
+            // 値オブジェクトが比較の手段を提供することで回避できる
+            && $this->middle_name === $other->middle_name;
     }
 }
