@@ -211,3 +211,43 @@ class LastName
  * 氏名だと、姓と名で構成されるルールがあり、単体で取り扱っているため値オブジェクトにする
  * 姓 or 名の場合、現在時点でシステム上の制約はないため、値オブジェクトにする必要はないと判断する
  */
+
+// 以下のようにすれば、値オブジェクトにしなくてもルール担保が可能
+class FullName4 implements IEquatable
+{
+    private readonly string $first_name;
+    private readonly string $last_name;
+
+    public function __construct(string $first_name, string $last_name)
+    {
+        if ($first_name === null) throw new InvalidArgumentException("名は必須です");
+        if ($last_name === null) throw new InvalidArgumentException("姓は必須です");
+        if (!$this->validateName($first_name)) throw new InvalidArgumentException("許可されていない文字が使われています");
+        if (!$this->validateName($last_name)) throw new InvalidArgumentException("許可されていない文字が使われています");
+
+        $this->first_name = $first_name;
+        $this->last_name = $last_name;
+    }
+
+    private function validateName(string $value): bool
+    {
+        return preg_match("/^[a-zA-Z]+$/", $value);
+    }
+
+    public function getFirstName(): string
+    {
+        return $this->first_name;
+    }
+
+    public function getLastName(): string
+    {
+        return $this->last_name;
+    }
+
+    public function equals(object $other): bool
+    {
+        return $other instanceof FullName4
+            && $this->first_name === $other->first_name
+            && $this->last_name === $other->last_name;
+    }
+}
