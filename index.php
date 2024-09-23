@@ -377,3 +377,36 @@ class ModelNumber
         return $this->product_code . "=" . $this->branch . "=" . $this->lot;
     }
 }
+
+/**
+ * 値オブジェクトを使うモチベーション
+ * 2. 不正な値を存在させない
+ */
+
+// ユーザー名は3文字以上という制約がある元で存在してはいけない値
+$userName = "me";
+// 不正な値の存在を許すとその値を利用する箇所で都度バリデーションを行う必要がある
+if (mb_strlen($userName) >= 3) {
+    // 正常な値なので処理する
+} else {
+    throw new Exception("ユーザー名は3文字以上である必要があります");
+}
+
+// 値オブジェクトをうまく利用すれば異常な値の存在を防げる
+class UserName
+{
+    private readonly string $value;
+
+    public function __construct(string $value)
+    {
+        if ($value === null) throw new InvalidArgumentException("ユーザー名は必須です");
+        if (mb_strlen($value) < 3) throw new InvalidArgumentException("ユーザー名は3文字以上である必要があります");
+
+        $this->value = $value;
+    }
+
+    public function getValue(): string
+    {
+        return $this->value;
+    }
+}
