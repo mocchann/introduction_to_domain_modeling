@@ -499,3 +499,8 @@ function createUser2(UserName2 $name): User2
     $user->id = $name; // TypeErrorが出る(静的型付け言語ならランタイムでなく、コンパイルエラーが出るがphpなので仕方なし。。)
     return $user;
 }
+
+/**
+ * 値オブジェクトを使うモチベーション
+ * 4. ロジックの散在を防ぐ
+ */
