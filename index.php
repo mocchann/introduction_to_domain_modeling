@@ -504,3 +504,59 @@ function createUser2(UserName2 $name): User2
  * 値オブジェクトを使うモチベーション
  * 4. ロジックの散在を防ぐ
  */
+
+// 入力値の確認を伴うユーザの作成処理
+function createUser3(string $name): void
+{
+    if ($name === null) throw new InvalidArgumentException("ユーザー名は必須です");
+    if (mb_strlen($name) < 3) throw new InvalidArgumentException("ユーザー名は3文字以上である必要があります");
+
+    $user = new User($name);
+    //　...略
+}
+
+// 局所的にこのコードに問題はないが、ユーザー情報を更新する処理があると、同様のコードを記述することになる
+function updateUser(string $id, string $name)
+{
+    if ($name === null) throw new InvalidArgumentException("ユーザー名は必須です");
+    if (mb_strlen($name) < 3) throw new InvalidArgumentException("ユーザー名は3文字以上である必要があります");
+
+    // ...略
+}
+
+// 上の例では2箇所変更で済むが実際のアプリケーションでは複数箇所に同じようなコードが潜んでいる可能性がある
+// 影響を調査して、変更を行うのは非常に面倒で労力が要求される
+
+// 値オブジェクトにルールをまとめることで、ロジックの散在を防ぐ
+class UserName3
+{
+    private readonly string $value;
+
+    public function __construct(string $value)
+    {
+        if ($value === null) throw new InvalidArgumentException("ユーザー名は必須です");
+        if (mb_strlen($value) < 3) throw new InvalidArgumentException("ユーザー名は3文字以上である必要があります");
+
+        $this->value = $value;
+    }
+
+    public function getValue(): string
+    {
+        return $this->value;
+    }
+}
+
+// 値オブジェクトを利用した新規作成処理と更新処理
+function createUser4(string $name): void
+{
+    $user_name = new UserName3($name);
+    $user = new User2();
+    // $user->setName($user_name);
+    // ...略
+}
+
+function updateUser2(string $id, string $name)
+{
+    $user_name = new UserName3($name);
+    // ...略
+}
