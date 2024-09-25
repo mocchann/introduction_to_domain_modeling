@@ -471,32 +471,27 @@ class User2
     public UserId $id;
     public UserName2 $name;
 
+    public function __construct(UserId $id, UserName2 $name)
+    {
+        $this->id = $id;
+        $this->name = $name;
+    }
+
     public function getId(): UserId
     {
         return $this->id;
-    }
-
-    public function setId(UserId $id): void
-    {
-        $this->id = $id;
     }
 
     public function getName(): UserName2
     {
         return $this->name;
     }
-
-    public function setName(UserName2 $name): void
-    {
-        $this->name = $name;
-    }
 }
 
 // このようにすることで、代入時に型が違うとエラーが出る
 function createUser2(UserName2 $name): User2
 {
-    $user = new User2();
-    $user->id = $name; // TypeErrorが出る(静的型付け言語ならランタイムでなく、コンパイルエラーが出るがphpなので仕方なし。。)
+    $user = new User2($name); // TypeErrorが出る(静的型付け言語ならランタイムでなく、コンパイルエラーが出るがphpなので仕方なし。。)
     return $user;
 }
 
@@ -550,8 +545,7 @@ class UserName3
 function createUser4(string $name): void
 {
     $user_name = new UserName3($name);
-    $user = new User2();
-    // $user->setName($user_name);
+    // $user = new User2($user_name);
     // ...略
 }
 
