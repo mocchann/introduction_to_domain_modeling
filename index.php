@@ -642,7 +642,7 @@ class User5
     }
 }
 
-class User6
+class User6 implements IEquatable
 {
     private readonly UserId2 $id;
     private string $name;
@@ -671,5 +671,21 @@ class User6
     public function getName(): string
     {
         return $this->name;
+    }
+
+    public function equals(object $other): bool
+    {
+        return $other instanceof User6
+            && $this->id === $other->id;
+    }
+}
+
+// エンティティの比較処理では同一性を表す識別子(id)だけが比較対象となる
+function check(User6 $left_user, User6 $right_user): void
+{
+    if ($left_user->equals($right_user)) {
+        echo "同じユーザーです" . "\n";
+    } else {
+        echo "異なるユーザーです" . "\n";
     }
 }
