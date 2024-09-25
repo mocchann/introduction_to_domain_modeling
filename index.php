@@ -642,7 +642,12 @@ class User5
     }
 }
 
-class User6 implements IEquatable
+interface IEquatable2
+{
+    public function equals(object $other): bool;
+}
+
+class User6 implements IEquatable2
 {
     private readonly UserId2 $id;
     private string $name;
