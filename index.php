@@ -554,3 +554,122 @@ function updateUser2(string $id, string $name)
     $user_name = new UserName3($name);
     // ...略
 }
+
+/**
+ * chapter3: Entity
+ */
+
+// 値オブジェクトとは異なり、Entityは可変である
+// ユーザーを表すclass
+class User3
+{
+    private string $name;
+
+    public function __construct(string $name)
+    {
+        if ($name === null) throw new InvalidArgumentException("ユーザー名は必須です");
+        if (mb_strlen($name) < 3) throw new InvalidArgumentException("ユーザー名は3文字以上である必要があります");
+
+        $this->name = $name;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+}
+
+// あとから思いついた素敵なユーザー名を登録できるようにするために可変なオブジェクトに変化させる
+class User4
+{
+    private string $name;
+
+    public function __construct(string $name)
+    {
+        $this->changeName($name);
+    }
+
+    public function changeName(string $name): void
+    {
+        if ($name === null) throw new InvalidArgumentException("ユーザー名は必須です");
+        if (mb_strlen($name) < 3) throw new InvalidArgumentException("ユーザー名は3文字以上である必要があります");
+
+        $this->name = $name;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+}
+
+// 値オブジェクトは同姓同名の人間も区別できないが、エンティティは同姓同名であっても区別できる
+// 人間同様にシステム上のユーザーも区別できるようにするためには、識別子を追加する
+class UserId2
+{
+    private string $value;
+
+    public function __construct(string $value)
+    {
+        if ($value === null) throw new InvalidArgumentException("ユーザーIDは必須です");
+
+        $this->value = $value;
+    }
+}
+
+class User5
+{
+    private readonly UserId2 $id;
+    private string $name;
+
+    public function __construct(UserId2 $id, string $name)
+    {
+        if ($id === null) throw new InvalidArgumentException("ユーザーIDは必須です");
+        if ($name === null) throw new InvalidArgumentException("ユーザー名は必須です");
+
+        $this->id = $id;
+        $this->name = $name;
+    }
+
+    public function getId(): UserId2
+    {
+        return $this->id;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+}
+
+class User6
+{
+    private readonly UserId2 $id;
+    private string $name;
+
+    public function __construct(UserId2 $id, string $name)
+    {
+        if ($id === null) throw new InvalidArgumentException("ユーザーIDは必須です");
+
+        $this->id = $id;
+        $this->changeUserName($name);
+    }
+
+    public function changeUserName(string $name): void
+    {
+        if ($name === null) throw new InvalidArgumentException("ユーザー名は必須です");
+        if (mb_strlen($name) < 3) throw new InvalidArgumentException("ユーザー名は3文字以上である必要があります");
+
+        $this->name = $name;
+    }
+
+    public function getId(): UserId2
+    {
+        return $this->id;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+}
