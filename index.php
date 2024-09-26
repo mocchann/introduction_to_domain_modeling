@@ -698,3 +698,49 @@ function check(User6 $left_user, User6 $right_user): void
 /**
  * chapter4: Domain Service
  */
+
+// 値オブジェクトやエンティティに記述すると不自然なふるまいはドメインサービスに記述する
+class User7
+{
+    private readonly UserId2 $id;
+    private UserName3 $name;
+
+    public function __construct(UserId2 $id, UserName3 $name)
+    {
+        if ($id === null) throw new InvalidArgumentException("ユーザーIDは必須です");
+        if ($name === null) throw new InvalidArgumentException("ユーザー名は必須です");
+
+        $this->id = $id;
+        $this->name = $name;
+    }
+
+    // 追加した重複確認の振る舞い
+    public function exists(User7 $user): bool
+    {
+        // 重複を確認するコード
+    }
+}
+
+// ↑のオブジェクトを使って重複確認をしてみる
+$user_id = new UserId2("id");
+$user_name = new UserName3("nrs");
+$user = new User7($user_id, $user_name);
+
+// 生成したオブジェクト自身に問い合わせをすることになる
+$duplicate_check_result = $user->exists($user);
+echo $duplicate_check_result . "\n"; // true? false?
+
+// 重複確認用のインスタンスを用意するのはどうか
+$check_id = new UserId2("check");
+$check_name = new UserName3("checker");
+// これはUserオブジェクトでありながら、ユーザーではないオブジェクト
+$check_object = new User7($check_id, $check_name);
+
+$user_id = new UserId2("id");
+$user_name = new UserName3("nrs");
+$user = new User7($user_id, $user_name);
+
+$duplicate_check_result = $check_object->exists($user);
+echo $duplicate_check_result . "\n";
+
+// このような不自然な
