@@ -694,3 +694,7 @@ function check(User6 $left_user, User6 $right_user): void
         echo "異なるユーザーです" . "\n";
     }
 }
+
+/**
+ * chapter4: Domain Service
+ */
