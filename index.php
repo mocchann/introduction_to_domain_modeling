@@ -471,32 +471,27 @@ class User2
     public UserId $id;
     public UserName2 $name;
 
+    public function __construct(UserId $id, UserName2 $name)
+    {
+        $this->id = $id;
+        $this->name = $name;
+    }
+
     public function getId(): UserId
     {
         return $this->id;
-    }
-
-    public function setId(UserId $id): void
-    {
-        $this->id = $id;
     }
 
     public function getName(): UserName2
     {
         return $this->name;
     }
-
-    public function setName(UserName2 $name): void
-    {
-        $this->name = $name;
-    }
 }
 
 // このようにすることで、代入時に型が違うとエラーが出る
 function createUser2(UserName2 $name): User2
 {
-    $user = new User2();
-    $user->id = $name; // TypeErrorが出る(静的型付け言語ならランタイムでなく、コンパイルエラーが出るがphpなので仕方なし。。)
+    $user = new User2($name); // TypeErrorが出る(静的型付け言語ならランタイムでなく、コンパイルエラーが出るがphpなので仕方なし。。)
     return $user;
 }
 
@@ -550,8 +545,7 @@ class UserName3
 function createUser4(string $name): void
 {
     $user_name = new UserName3($name);
-    $user = new User2();
-    // $user->setName($user_name);
+    // $user = new User2($user_name);
     // ...略
 }
 
@@ -559,4 +553,144 @@ function updateUser2(string $id, string $name)
 {
     $user_name = new UserName3($name);
     // ...略
+}
+
+/**
+ * chapter3: Entity
+ */
+
+// 値オブジェクトとは異なり、Entityは可変である
+// ユーザーを表すclass
+class User3
+{
+    private string $name;
+
+    public function __construct(string $name)
+    {
+        if ($name === null) throw new InvalidArgumentException("ユーザー名は必須です");
+        if (mb_strlen($name) < 3) throw new InvalidArgumentException("ユーザー名は3文字以上である必要があります");
+
+        $this->name = $name;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+}
+
+// あとから思いついた素敵なユーザー名を登録できるようにするために可変なオブジェクトに変化させる
+class User4
+{
+    private string $name;
+
+    public function __construct(string $name)
+    {
+        $this->changeName($name);
+    }
+
+    public function changeName(string $name): void
+    {
+        if ($name === null) throw new InvalidArgumentException("ユーザー名は必須です");
+        if (mb_strlen($name) < 3) throw new InvalidArgumentException("ユーザー名は3文字以上である必要があります");
+
+        $this->name = $name;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+}
+
+// 値オブジェクトは同姓同名の人間も区別できないが、エンティティは同姓同名であっても区別できる
+// 人間同様にシステム上のユーザーも区別できるようにするためには、識別子を追加する
+class UserId2
+{
+    private string $value;
+
+    public function __construct(string $value)
+    {
+        if ($value === null) throw new InvalidArgumentException("ユーザーIDは必須です");
+
+        $this->value = $value;
+    }
+}
+
+class User5
+{
+    private readonly UserId2 $id;
+    private string $name;
+
+    public function __construct(UserId2 $id, string $name)
+    {
+        if ($id === null) throw new InvalidArgumentException("ユーザーIDは必須です");
+        if ($name === null) throw new InvalidArgumentException("ユーザー名は必須です");
+
+        $this->id = $id;
+        $this->name = $name;
+    }
+
+    public function getId(): UserId2
+    {
+        return $this->id;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+}
+
+interface IEquatable2
+{
+    public function equals(object $other): bool;
+}
+
+class User6 implements IEquatable2
+{
+    private readonly UserId2 $id;
+    private string $name;
+
+    public function __construct(UserId2 $id, string $name)
+    {
+        if ($id === null) throw new InvalidArgumentException("ユーザーIDは必須です");
+
+        $this->id = $id;
+        $this->changeUserName($name);
+    }
+
+    public function changeUserName(string $name): void
+    {
+        if ($name === null) throw new InvalidArgumentException("ユーザー名は必須です");
+        if (mb_strlen($name) < 3) throw new InvalidArgumentException("ユーザー名は3文字以上である必要があります");
+
+        $this->name = $name;
+    }
+
+    public function getId(): UserId2
+    {
+        return $this->id;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function equals(object $other): bool
+    {
+        return $other instanceof User6
+            && $this->id === $other->id;
+    }
+}
+
+// エンティティの比較処理では同一性を表す識別子(id)だけが比較対象となる
+function check(User6 $left_user, User6 $right_user): void
+{
+    if ($left_user->equals($right_user)) {
+        echo "同じユーザーです" . "\n";
+    } else {
+        echo "異なるユーザーです" . "\n";
+    }
 }
