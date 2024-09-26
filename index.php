@@ -743,4 +743,4 @@ $user = new User7($user_id, $user_name);
 $duplicate_check_result = $check_object->exists($user);
 echo $duplicate_check_result . "\n";
 
-// このような不自然な
+// このような不自然さを解決するのがドメインサービス
