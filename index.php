@@ -489,10 +489,10 @@ class User2
 }
 
 // このようにすることで、代入時に型が違うとエラーが出る
-function createUser2(UserName2 $name): User2
+function createUser2(UserName2 $name)
 {
-    $user = new User2($name); // TypeErrorが出る(静的型付け言語ならランタイムでなく、コンパイルエラーが出るがphpなので仕方なし。。)
-    return $user;
+    // $user = new User2($name); // TypeErrorが出る(静的型付け言語ならランタイムでなく、コンパイルエラーが出るがphpなので仕方なし。。)
+    // return $user;
 }
 
 /**
@@ -715,7 +715,7 @@ class User7
     }
 
     // 追加した重複確認の振る舞い
-    public function exists(User7 $user): bool
+    public function exists(User7 $user)
     {
         // 重複を確認するコード
     }
@@ -746,7 +746,7 @@ echo $duplicate_check_result . "\n";
 // このような不自然さを解決するのがドメインサービス
 class UserService
 {
-    public function exists(User7 $user): bool
+    public function exists(User7 $user)
     {
         // 重複を確認するコード
     }
@@ -760,3 +760,50 @@ $user = new User7($user_id, $user_name);
 // ドメインサービスに問い合わせ
 $duplicate_check_result = $user_service->exists($user);
 echo $duplicate_check_result . "\n";
+
+// ドメインサービスにはすべてのふるまいを記述できてしまう
+class User8
+{
+    private readonly UserId2 $id;
+    public UserName3 $name;
+
+    public function __construct(UserId2 $id, UserName3 $name)
+    {
+        $this->id = $id;
+        $this->name = $name;
+    }
+
+    public function getId(): UserId2
+    {
+        return $this->id;
+    }
+
+    public function getName(): UserName3
+    {
+        return $this->name;
+    }
+
+    public function setName(UserName3 $name)
+    {
+        $this->name = $name;
+    }
+}
+
+// ドメインサービスにユーザー名変更のふるまいを記述するとUserオブジェクトからふるまいやルールを読み取ることができなくなる
+// これをドメインモデル貧血症といって、オブジェクト指向のデータとふるまいをまとめる戦略の逆を行っている
+// ユーザー名を変更するふるまいはUserクラスに定義するべき
+class UserService2
+{
+    public function changeName(User8 $user, UserName3 $name)
+    {
+        if ($user === null) throw new InvalidArgumentException("ユーザーは必須です");
+        if ($name === null) throw new InvalidArgumentException("ユーザー名は必須です");
+
+        $user->name = $name;
+    }
+
+    public function createUser(UserId2 $id, UserName3 $name): User8
+    {
+        return new User8($id, $name);
+    }
+}
