@@ -744,3 +744,19 @@ $duplicate_check_result = $check_object->exists($user);
 echo $duplicate_check_result . "\n";
 
 // このような不自然さを解決するのがドメインサービス
+class UserService
+{
+    public function exists(User7 $user): bool
+    {
+        // 重複を確認するコード
+    }
+}
+
+$user_service = new UserService();
+$user_id = new UserId2("id");
+$user_name = new UserName3("nrs");
+$user = new User7($user_id, $user_name);
+
+// ドメインサービスに問い合わせ
+$duplicate_check_result = $user_service->exists($user);
+echo $duplicate_check_result . "\n";
