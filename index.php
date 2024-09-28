@@ -807,3 +807,64 @@ class UserService2
         return new User8($id, $name);
     }
 }
+
+// ユースケースを組み立てる
+// まずはユーザーを作成
+class User9
+{
+    private readonly UserId3 $id;
+    private UserName4 $name;
+
+    public function __construct(UserName4 $name)
+    {
+        if ($name === null) throw new InvalidArgumentException("ユーザー名は必須です");
+
+        $this->id = new UserId3(uniqid());
+        $this->name = $name;
+    }
+
+    public function getId(): UserId3
+    {
+        return $this->id;
+    }
+
+    public function getName(): UserName4
+    {
+        return $this->name;
+    }
+}
+
+class UserId3
+{
+    private string $value;
+
+    public function __construct(string $value)
+    {
+        if ($value === null) throw new InvalidArgumentException("ユーザーIDは必須です");
+
+        $this->value = $value;
+    }
+
+    public function getValue(): string
+    {
+        return $this->value;
+    }
+}
+
+class UserName4
+{
+    private string $value;
+
+    public function __construct(string $value)
+    {
+        if ($value === null) throw new InvalidArgumentException("ユーザー名は必須です");
+        if (mb_strlen($value) < 3) throw new InvalidArgumentException("ユーザー名は3文字以上である必要があります");
+
+        $this->value = $value;
+    }
+
+    public function getValue(): string
+    {
+        return $this->value;
+    }
+}
