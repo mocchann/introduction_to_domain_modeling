@@ -489,10 +489,10 @@ class User2
 }
 
 // このようにすることで、代入時に型が違うとエラーが出る
-function createUser2(UserName2 $name): User2
+function createUser2(UserName2 $name)
 {
-    $user = new User2($name); // TypeErrorが出る(静的型付け言語ならランタイムでなく、コンパイルエラーが出るがphpなので仕方なし。。)
-    return $user;
+    // $user = new User2($name); // TypeErrorが出る(静的型付け言語ならランタイムでなく、コンパイルエラーが出るがphpなので仕方なし。。)
+    // return $user;
 }
 
 /**
@@ -692,5 +692,279 @@ function check(User6 $left_user, User6 $right_user): void
         echo "同じユーザーです" . "\n";
     } else {
         echo "異なるユーザーです" . "\n";
+    }
+}
+
+/**
+ * chapter4: Domain Service
+ */
+
+// 値オブジェクトやエンティティに記述すると不自然なふるまいはドメインサービスに記述する
+class User7
+{
+    private readonly UserId2 $id;
+    private UserName3 $name;
+
+    public function __construct(UserId2 $id, UserName3 $name)
+    {
+        if ($id === null) throw new InvalidArgumentException("ユーザーIDは必須です");
+        if ($name === null) throw new InvalidArgumentException("ユーザー名は必須です");
+
+        $this->id = $id;
+        $this->name = $name;
+    }
+
+    // 追加した重複確認の振る舞い
+    public function exists(User7 $user)
+    {
+        // 重複を確認するコード
+    }
+}
+
+// ↑のオブジェクトを使って重複確認をしてみる
+$user_id = new UserId2("id");
+$user_name = new UserName3("nrs");
+$user = new User7($user_id, $user_name);
+
+// 生成したオブジェクト自身に問い合わせをすることになる
+$duplicate_check_result = $user->exists($user);
+echo $duplicate_check_result . "\n"; // true? false?
+
+// 重複確認用のインスタンスを用意するのはどうか
+$check_id = new UserId2("check");
+$check_name = new UserName3("checker");
+// これはUserオブジェクトでありながら、ユーザーではないオブジェクト
+$check_object = new User7($check_id, $check_name);
+
+$user_id = new UserId2("id");
+$user_name = new UserName3("nrs");
+$user = new User7($user_id, $user_name);
+
+$duplicate_check_result = $check_object->exists($user);
+echo $duplicate_check_result . "\n";
+
+// このような不自然さを解決するのがドメインサービス
+class UserService
+{
+    public function exists(User7 $user)
+    {
+        // 重複を確認するコード
+    }
+}
+
+$user_service = new UserService();
+$user_id = new UserId2("id");
+$user_name = new UserName3("nrs");
+$user = new User7($user_id, $user_name);
+
+// ドメインサービスに問い合わせ
+$duplicate_check_result = $user_service->exists($user);
+echo $duplicate_check_result . "\n";
+
+// ドメインサービスにはすべてのふるまいを記述できてしまう
+class User8
+{
+    private readonly UserId2 $id;
+    public UserName3 $name;
+
+    public function __construct(UserId2 $id, UserName3 $name)
+    {
+        $this->id = $id;
+        $this->name = $name;
+    }
+
+    public function getId(): UserId2
+    {
+        return $this->id;
+    }
+
+    public function getName(): UserName3
+    {
+        return $this->name;
+    }
+
+    public function setName(UserName3 $name)
+    {
+        $this->name = $name;
+    }
+}
+
+// ドメインサービスにユーザー名変更のふるまいを記述するとUserオブジェクトからふるまいやルールを読み取ることができなくなる
+// これをドメインモデル貧血症といって、オブジェクト指向のデータとふるまいをまとめる戦略の逆を行っている
+// ユーザー名を変更するふるまいはUserクラスに定義するべき
+class UserService2
+{
+    public function changeName(User8 $user, UserName3 $name)
+    {
+        if ($user === null) throw new InvalidArgumentException("ユーザーは必須です");
+        if ($name === null) throw new InvalidArgumentException("ユーザー名は必須です");
+
+        $user->name = $name;
+    }
+
+    public function createUser(UserId2 $id, UserName3 $name): User8
+    {
+        return new User8($id, $name);
+    }
+}
+
+// ユースケースを組み立てる
+// まずはユーザーを作成
+class User9
+{
+    private readonly UserId3 $id;
+    private UserName4 $name;
+
+    public function __construct(UserName4 $name)
+    {
+        if ($name === null) throw new InvalidArgumentException("ユーザー名は必須です");
+
+        $this->id = new UserId3(uniqid());
+        $this->name = $name;
+    }
+
+    public function getId(): UserId3
+    {
+        return $this->id;
+    }
+
+    public function getName(): UserName4
+    {
+        return $this->name;
+    }
+}
+
+class UserId3
+{
+    private string $value;
+
+    public function __construct(string $value)
+    {
+        if ($value === null) throw new InvalidArgumentException("ユーザーIDは必須です");
+
+        $this->value = $value;
+    }
+
+    public function getValue(): string
+    {
+        return $this->value;
+    }
+}
+
+class UserName4
+{
+    private string $value;
+
+    public function __construct(string $value)
+    {
+        if ($value === null) throw new InvalidArgumentException("ユーザー名は必須です");
+        if (mb_strlen($value) < 3) throw new InvalidArgumentException("ユーザー名は3文字以上である必要があります");
+
+        $this->value = $value;
+    }
+
+    public function getValue(): string
+    {
+        return $this->value;
+    }
+}
+
+// ユーザー作成の具体的な処理
+class Program
+{
+    public function createUser(string $user_name): void
+    {
+        $user_name = new UserName4($user_name);
+        $user =  new User9($user_name);
+
+        $user_service = new UserService3();
+        if ($user_service->exists($user)) {
+            throw new Exception($user . "は既に存在しています");
+        }
+
+        $connectionString = "mysql:host=localhost;dbname=test";
+        $username = "my_db_username";
+        $password = "my_db_password";
+
+        try {
+            $connection = new PDO($connectionString, $username, $password);
+            $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            $sql = "INSERT INTO users (id, name) VALUES (:id, :name)";
+            $statement = $connection->prepare($sql);
+            $statement->bindParam(":id", $user->getId()->getValue());
+            $statement->bindParam(":name", $user->getName()->getValue());
+
+            $statement->execute();
+        } catch (PDOException $e) {
+            throw new Exception("データベースエラー:" . $e->getMessage());
+        }
+    }
+}
+
+// ドメインサービスの実装
+// このコードだと柔軟性に乏しい
+//例えばデータストアがRDBからNoSQLに変わった場合、ユーザー作成処理の本質は変わらないにも関わらず、このコードは全て書き換える必要がある
+class UserService3
+{
+    public function exists(User9 $user): bool
+    {
+        $connectionString = "mysql:host=localhost;dbname=test";
+        $username = "my_db_username";
+        $password = "my_db_password";
+
+        try {
+            $connection = new PDO($connectionString, $username, $password);
+            $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            $sql = "SELECT * FROM users WHERE id = :id";
+            $statement = $connection->prepare($sql);
+            $statement->bindParam(":id", $user->getId()->getValue());
+
+            $statement->execute();
+            $count = $statement->fetchColumn();
+
+            return $count > 0;
+        } catch (PDOException $e) {
+            throw new Exception("データベースエラー:" . $e->getMessage());
+        }
+    }
+}
+
+// データストアといったインフラストラクチャが絡まないドメインオブジェクトの操作に徹した例
+// 物流拠点のエンティティ
+class PhysicalDistributionBase
+{
+    // ...略
+
+    public function ship(Baggage $baggage) // 出庫
+    {
+        // ...略
+    }
+
+    public function receive(Baggage $baggage) // 入庫
+    {
+        // ...略
+    }
+
+    // 物流拠点に輸送のふるまいを定義する
+    public function transport(PhysicalDistributionBase $to, Baggage $baggage)
+    {
+        $shippedBaggage = $this->ship($baggage);
+        $to->receive($shippedBaggage);
+    }
+}
+
+// 物流拠点から物流拠点に直接荷物を渡すのは違和感を覚える
+// このようなふるまいは輸送を執り行うドメインサービスに記述する
+class TransportService
+{
+    public function transport(PhysicalDistributionBase $from, PhysicalDistributionBase $to, Baggage $baggage)
+    {
+        $shippedBaggage = $from->ship($baggage);
+        $to->receive($shippedBaggage);
+
+        // 輸送の記録を残す
+        // ...略
     }
 }
