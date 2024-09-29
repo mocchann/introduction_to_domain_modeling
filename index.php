@@ -868,3 +868,65 @@ class UserName4
         return $this->value;
     }
 }
+
+// ユーザー作成の具体的な処理
+class Program
+{
+    public function createUser(string $user_name): void
+    {
+        $user_name = new UserName4($user_name);
+        $user =  new User9($user_name);
+
+        $user_service = new UserService3();
+        if ($user_service->exists($user)) {
+            throw new Exception($user . "は既に存在しています");
+        }
+
+        $connectionString = "mysql:host=localhost;dbname=test";
+        $username = "my_db_username";
+        $password = "my_db_password";
+
+        try {
+            $connection = new PDO($connectionString, $username, $password);
+            $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            $sql = "INSERT INTO users (id, name) VALUES (:id, :name)";
+            $statement = $connection->prepare($sql);
+            $statement->bindParam(":id", $user->getId()->getValue());
+            $statement->bindParam(":name", $user->getName()->getValue());
+
+            $statement->execute();
+        } catch (PDOException $e) {
+            throw new Exception("データベースエラー:" . $e->getMessage());
+        }
+    }
+}
+
+// ドメインサービスの実装
+// このコードだと柔軟性に乏しい
+//例えばデータストアがRDBからNoSQLに変わった場合、ユーザー作成処理の本質は変わらないにも関わらず、このコードは全て書き換える必要がある
+class UserService3
+{
+    public function exists(User9 $user): bool
+    {
+        $connectionString = "mysql:host=localhost;dbname=test";
+        $username = "my_db_username";
+        $password = "my_db_password";
+
+        try {
+            $connection = new PDO($connectionString, $username, $password);
+            $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            $sql = "SELECT * FROM users WHERE id = :id";
+            $statement = $connection->prepare($sql);
+            $statement->bindParam(":id", $user->getId()->getValue());
+
+            $statement->execute();
+            $count = $statement->fetchColumn();
+
+            return $count > 0;
+        } catch (PDOException $e) {
+            throw new Exception("データベースエラー:" . $e->getMessage());
+        }
+    }
+}
