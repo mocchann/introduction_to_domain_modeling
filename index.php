@@ -930,3 +930,41 @@ class UserService3
         }
     }
 }
+
+// データストアといったインフラストラクチャが絡まないドメインオブジェクトの操作に徹した例
+// 物流拠点のエンティティ
+class PhysicalDistributionBase
+{
+    // ...略
+
+    public function ship(Baggage $baggage) // 出庫
+    {
+        // ...略
+    }
+
+    public function receive(Baggage $baggage) // 入庫
+    {
+        // ...略
+    }
+
+    // 物流拠点に輸送のふるまいを定義する
+    public function transport(PhysicalDistributionBase $to, Baggage $baggage)
+    {
+        $shippedBaggage = $this->ship($baggage);
+        $to->receive($shippedBaggage);
+    }
+}
+
+// 物流拠点から物流拠点に直接荷物を渡すのは違和感を覚える
+// このようなふるまいは輸送を執り行うドメインサービスに記述する
+class TransportService
+{
+    public function transport(PhysicalDistributionBase $from, PhysicalDistributionBase $to, Baggage $baggage)
+    {
+        $shippedBaggage = $from->ship($baggage);
+        $to->receive($shippedBaggage);
+
+        // 輸送の記録を残す
+        // ...略
+    }
+}
