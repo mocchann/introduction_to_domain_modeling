@@ -995,3 +995,22 @@ class Program2
         $user_service->save($user);
     }
 }
+
+// リポジトリを利用したドメインサービスの実装
+// このように永続化をリポジトリを用いて抽象化することで、ビジネスロジックはより純粋なものに昇華される
+class UserService4
+{
+    private IUserRepository $user_repository;
+
+    public function __construct(IUserRepository $user_repository)
+    {
+        $this->user_repository = $user_repository;
+    }
+
+    public function exists(User9 $user): bool
+    {
+        $found = $user_repository->find($user->getName());
+
+        return $found !== null;
+    }
+}
