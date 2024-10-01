@@ -972,3 +972,26 @@ class TransportService
 /**
  * chapter5: Repository
  */
+
+// UserService3のような具体的でややこしいデータ永続化の処理は抽象的に扱うと処理の趣旨が際立つ
+class Program2
+{
+    private IUserRepository $user_repository;
+
+    public function __construct(IUserRepository $user_repository)
+    {
+        $this->user_repository = $user_repository;
+    }
+
+    public function createUser(string $user_name): void
+    {
+        $user = new User9(new UserName4($user_name));
+
+        $user_service = new UserService4($this->user_repository);
+        if ($user_service->exists($user)) {
+            throw new Exception($user . "は既に存在しています");
+        }
+
+        $user_service->save($user);
+    }
+}
