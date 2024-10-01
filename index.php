@@ -1009,8 +1009,15 @@ class UserService4
 
     public function exists(User9 $user): bool
     {
-        $found = $user_repository->find($user->getName());
+        $found = $this->user_repository->find($user->getName());
 
         return $found !== null;
     }
+}
+
+// Userクラスのリポジトリインターフェース
+interface IUserRepository
+{
+    public function find(UserName4 $name): User9;
+    public function save(User9 $user): void;
 }
