@@ -1025,3 +1025,12 @@ interface IUserRepository
     // ユーザーの重複チェックはドメインに近く、をれをリポジトリに実装するのは責務としてふさわしくない
     // public function exists(User9 $user): bool;
 }
+
+// もしドメインサービスにインフラストラクチャにまつわる処理を嫌って、リポジトリにexistsメソッドを実装したい場合
+interface IUserRepository2
+{
+    public function find(UserName4 $name): User9;
+    public function save(User9 $user): void;
+    // 重複確認のキーを渡すようにすれば、ドメインサービス側から見ても何によって重複確認を行っているかが明確になる
+    public function exists(UserName4 $user): bool;
+}
