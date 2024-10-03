@@ -1021,9 +1021,12 @@ interface IUserRepository
 {
     public function find(UserName4 $name): User9;
     public function save(User9 $user): void;
-    // 重複チェックという目的を鑑みるとexistsメソッドをリポジトリに実装するアイディアもあるが、リポジトリの責務はあくまでオブジェクト永続化
-    // ユーザーの重複チェックはドメインに近く、をれをリポジトリに実装するのは責務としてふさわしくない
-    // public function exists(User9 $user): bool;
+    /**
+     * 重複チェックという目的を鑑みるとexistsメソッドをリポジトリに実装するアイディアもあるが、リポジトリの責務はあくまでオブジェクト永続化
+     * ユーザーの重複チェックはドメインに近く、をれをリポジトリに実装するのは責務としてふさわしくない
+     * 
+     * public function exists(User9 $user): bool;
+     */
 }
 
 // もしドメインサービスにインフラストラクチャにまつわる処理を嫌って、リポジトリにexistsメソッドを実装したい場合
