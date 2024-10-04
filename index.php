@@ -1069,3 +1069,8 @@ class UserRepository implements IUserRepository
         return $statement->fetchObject(User9::class);
     }
 }
+
+// リポジトリをProgramクラスに渡す
+$user_repository = new UserRepository();
+$program = new Program2($user_repository);
+$program->createUser("nrs");
