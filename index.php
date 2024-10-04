@@ -1037,3 +1037,30 @@ interface IUserRepository2
     // 重複確認のキーを渡すようにすれば、ドメインサービス側から見ても何によって重複確認を行っているかが明確になる
     public function exists(UserName4 $user): bool;
 }
+
+// SQLを利用したリポジトリ
+class UserRepository implements IUserRepository
+{
+    private string $connectionString = "mysql:host=localhost;dbname=test";
+
+    public function save(User9 $user): void
+    {
+        $connection = new PDO($this->connectionString, "my_db_username", "my_db_password");
+        $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $sql = "INSERT INTO users (id, name) VALUES (:id, :name)";
+        $statement = $connection->prepare($sql);
+        $statement->bindParam(":id", $user->getId()->getValue());
+        $statement->bindParam(":name", $user->getName()->getValue());
+
+        $statement->execute();
+    }
+
+    public function find(UserName4 $name): User9
+    {
+        // 処理内容は違うが省略する
+        return new User9($name);
+    }
+
+    // ...略
+}
