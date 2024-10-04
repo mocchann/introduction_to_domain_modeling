@@ -1058,9 +1058,14 @@ class UserRepository implements IUserRepository
 
     public function find(UserName4 $name): User9
     {
-        // 処理内容は違うが省略する
-        return new User9($name);
-    }
+        $connection = new PDO($this->connectionString, "my_db_username", "my_db_password");
+        $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // ...略
+        $sql = "SELECT * FROM users WHERE name = :name";
+        $statement = $connection->prepare($sql);
+        $statement->bindParam(":name", $name->getValue());
+        $statement->execute();
+
+        return $statement->fetchObject(User9::class);
+    }
 }
