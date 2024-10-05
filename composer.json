@@ -1,4 +1,7 @@
 {
     "name": "root/html",
-    "require": {}
+    "require": {
+        "illuminate/database": "^11.26",
+        "illuminate/events": "^11.26"
+    }
 }

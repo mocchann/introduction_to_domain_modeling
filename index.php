@@ -4,6 +4,8 @@
  * Chapter2: Value Object
  */
 
+use Illuminate\Database\Schema\MySqlBuilder;
+
 // プリミティブな値で「氏名」を表現する
 $full_name = "naruse masanobu";
 echo $full_name . "\n";
@@ -1139,3 +1141,36 @@ $program->createUser("nrs");
 // データを取り出して確認
 $head = $user_repository->store[0];
 assert($head->getName()->getValue() === "nrs");
+
+// ORMを利用したリポジトリ
+class ORMUserRepository implements IUserRepository3
+{
+    private readonly MySqlBuilder $builder;
+
+    public function __construct(MySqlBuilder $builder)
+    {
+        $this->builder = $builder;
+    }
+
+    public function find(UserName4 $name): ?User10
+    {
+        $target = $this->builder->table("users")->where("name", $name->getValue())->first();
+        if (is_null($target)) return null;
+        return new User10(new UserId($target->id), new UserName4($target->name));
+    }
+
+    public function save(User10 $user): void
+    {
+        $found = $this->builder->table("users")->where("id", $user->getId()->getValue())->first();
+        if (is_null($found)) {
+            $this->builder->table("users")->insert([
+                "id" => $user->getId()->getValue(),
+                "name" => $user->getName()->getValue()
+            ]);
+        } else {
+            $this->builder->table("users")->where("id", $user->getId()->getValue())->update([
+                "name" => $user->getName()->getValue()
+            ]);
+        }
+    }
+}
