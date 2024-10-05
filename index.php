@@ -4,6 +4,8 @@
  * Chapter2: Value Object
  */
 
+use Illuminate\Database\Schema\MySqlBuilder;
+
 // プリミティブな値で「氏名」を表現する
 $full_name = "naruse masanobu";
 echo $full_name . "\n";
@@ -968,3 +970,216 @@ class TransportService
         // ...略
     }
 }
+
+/**
+ * chapter5: Repository
+ */
+
+// UserService3のような具体的でややこしいデータ永続化の処理は抽象的に扱うと処理の趣旨が際立つ
+class Program2
+{
+    private IUserRepository $user_repository;
+
+    public function __construct(IUserRepository $user_repository)
+    {
+        $this->user_repository = $user_repository;
+    }
+
+    public function createUser(string $user_name): void
+    {
+        $user = new User9(new UserName4($user_name));
+
+        $user_service = new UserService4($this->user_repository);
+        if ($user_service->exists($user)) {
+            throw new Exception($user . "は既に存在しています");
+        }
+
+        $user_service->save($user);
+    }
+}
+
+// リポジトリを利用したドメインサービスの実装
+// このように永続化をリポジトリを用いて抽象化することで、ビジネスロジックはより純粋なものに昇華される
+class UserService4
+{
+    private IUserRepository $user_repository;
+
+    public function __construct(IUserRepository $user_repository)
+    {
+        $this->user_repository = $user_repository;
+    }
+
+    public function exists(User9 $user): bool
+    {
+        $found = $this->user_repository->find($user->getName());
+
+        return $found !== null;
+    }
+}
+
+// Userクラスのリポジトリインターフェース
+// インスタンスを保存するふるまいとユーザー名によるインスタンスの復元を提供している
+interface IUserRepository
+{
+    public function find(UserName4 $name): User9;
+    public function save(User9 $user): void;
+    /**
+     * 重複チェックという目的を鑑みるとexistsメソッドをリポジトリに実装するアイディアもあるが、リポジトリの責務はあくまでオブジェクト永続化
+     * ユーザーの重複チェックはドメインに近く、をれをリポジトリに実装するのは責務としてふさわしくない
+     * 
+     * public function exists(User9 $user): bool;
+     */
+}
+
+// もしドメインサービスにインフラストラクチャにまつわる処理を嫌って、リポジトリにexistsメソッドを実装したい場合
+interface IUserRepository2
+{
+    public function find(UserName4 $name): User9;
+    public function save(User9 $user): void;
+    // 重複確認のキーを渡すようにすれば、ドメインサービス側から見ても何によって重複確認を行っているかが明確になる
+    public function exists(UserName4 $user): bool;
+}
+
+// SQLを利用したリポジトリ
+class UserRepository implements IUserRepository
+{
+    private string $connectionString = "mysql:host=localhost;dbname=test";
+
+    public function save(User9 $user): void
+    {
+        $connection = new PDO($this->connectionString, "my_db_username", "my_db_password");
+        $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $sql = "INSERT INTO users (id, name) VALUES (:id, :name)";
+        $statement = $connection->prepare($sql);
+        $statement->bindParam(":id", $user->getId()->getValue());
+        $statement->bindParam(":name", $user->getName()->getValue());
+
+        $statement->execute();
+    }
+
+    public function find(UserName4 $name): User9
+    {
+        $connection = new PDO($this->connectionString, "my_db_username", "my_db_password");
+        $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $sql = "SELECT * FROM users WHERE name = :name";
+        $statement = $connection->prepare($sql);
+        $statement->bindParam(":name", $name->getValue());
+        $statement->execute();
+
+        return $statement->fetchObject(User9::class);
+    }
+}
+
+// リポジトリをProgramクラスに渡す
+$user_repository = new UserRepository();
+$program = new Program2($user_repository);
+$program->createUser("nrs");
+
+class User10
+{
+    private UserId $id;
+    private UserName4 $name;
+
+    public function __construct(UserId $id, UserName4 $name)
+    {
+        $this->id = $id;
+        $this->name = $name;
+    }
+
+    public function getId(): UserId
+    {
+        return $this->id;
+    }
+
+    public function getName(): UserName4
+    {
+        return $this->name;
+    }
+
+    public function __clone()
+    {
+        // 必要に応じて、ディープコピーのためのカスタムクローン処理を追加
+        $this->id = clone $this->id;
+        $this->name = clone $this->name;
+    }
+}
+
+interface IUserRepository3
+{
+    public function find(UserName4 $name): ?User10;
+    public function save(User10 $user): void;
+}
+
+// テスト用のリポジトリ
+class InMemoryUserRepository implements IUserRepository3
+{
+    private array $store = [];
+
+    public function find(UserName4 $user_name): ?User10
+    {
+        foreach ($this->store as $user) {
+            if ($user_name === $user->getName()) {
+                return clone $user;
+            }
+        }
+        return null;
+    }
+
+    public function save(User10 $user): void
+    {
+        $this->store[$user->getId()->getValue()] = clone $user;
+    }
+}
+
+// ユーザー作成処理をテストする
+$user_repository = new InMemoryUserRepository();
+$program = new Program2($user_repository);
+$program->createUser("nrs");
+
+// データを取り出して確認
+$head = $user_repository->store[0];
+assert($head->getName()->getValue() === "nrs");
+
+// ORMを利用したリポジトリ
+class ORMUserRepository implements IUserRepository3
+{
+    private readonly MySqlBuilder $builder;
+
+    public function __construct(MySqlBuilder $builder)
+    {
+        $this->builder = $builder;
+    }
+
+    public function find(UserName4 $name): ?User10
+    {
+        $target = $this->builder->table("users")->where("name", $name->getValue())->first();
+        if (is_null($target)) return null;
+        return new User10(new UserId($target->id), new UserName4($target->name));
+    }
+
+    public function save(User10 $user): void
+    {
+        $found = $this->builder->table("users")->where("id", $user->getId()->getValue())->first();
+        if (is_null($found)) {
+            $this->builder->table("users")->insert([
+                "id" => $user->getId()->getValue(),
+                "name" => $user->getName()->getValue()
+            ]);
+        } else {
+            $this->builder->table("users")->where("id", $user->getId()->getValue())->update([
+                "name" => $user->getName()->getValue()
+            ]);
+        }
+    }
+}
+
+// ORMリポジトリを利用したテスト
+$user_repository = new ORMUserRepository(new MySqlBuilder());
+$program = new Program2($user_repository);
+$program->createUser("nrs");
+
+// データを取り出して確認
+$head = $user_repository->find(new UserName4("nrs"));
+assert($head->getName()->getValue() === "nrs");
