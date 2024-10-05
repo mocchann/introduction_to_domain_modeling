@@ -1183,3 +1183,7 @@ $program->createUser("nrs");
 // データを取り出して確認
 $head = $user_repository->find(new UserName4("nrs"));
 assert($head->getName()->getValue() === "nrs");
+
+/**
+ * chapter6: Application Service
+ */
