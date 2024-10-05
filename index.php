@@ -1174,3 +1174,12 @@ class ORMUserRepository implements IUserRepository3
         }
     }
 }
+
+// ORMリポジトリを利用したテスト
+$user_repository = new ORMUserRepository(new MySqlBuilder());
+$program = new Program2($user_repository);
+$program->createUser("nrs");
+
+// データを取り出して確認
+$head = $user_repository->find(new UserName4("nrs"));
+assert($head->getName()->getValue() === "nrs");
