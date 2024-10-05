@@ -1074,3 +1074,59 @@ class UserRepository implements IUserRepository
 $user_repository = new UserRepository();
 $program = new Program2($user_repository);
 $program->createUser("nrs");
+
+class User10
+{
+    private UserId $id;
+    private UserName4 $name;
+
+    public function __construct(UserId $id, UserName4 $name)
+    {
+        $this->id = $id;
+        $this->name = $name;
+    }
+
+    public function getId(): UserId
+    {
+        return $this->id;
+    }
+
+    public function getName(): UserName4
+    {
+        return $this->name;
+    }
+
+    public function __clone()
+    {
+        // 必要に応じて、ディープコピーのためのカスタムクローン処理を追加
+        $this->id = clone $this->id;
+        $this->name = clone $this->name;
+    }
+}
+
+interface IUserRepository3
+{
+    public function find(UserName4 $name): ?User10;
+    public function save(User10 $user): void;
+}
+
+// テスト用のリポジトリ
+class InMemoryUserRepository implements IUserRepository3
+{
+    private array $store = [];
+
+    public function find(UserName4 $user_name): ?User10
+    {
+        foreach ($this->store as $user) {
+            if ($user_name === $user->getName()) {
+                return clone $user;
+            }
+        }
+        return null;
+    }
+
+    public function save(User10 $user): void
+    {
+        $this->store[$user->getId()->getValue()] = clone $user;
+    }
+}
