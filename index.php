@@ -1130,3 +1130,12 @@ class InMemoryUserRepository implements IUserRepository3
         $this->store[$user->getId()->getValue()] = clone $user;
     }
 }
+
+// ユーザー作成処理をテストする
+$user_repository = new InMemoryUserRepository();
+$program = new Program2($user_repository);
+$program->createUser("nrs");
+
+// データを取り出して確認
+$head = $user_repository->store[0];
+assert($head->getName()->getValue() === "nrs");
