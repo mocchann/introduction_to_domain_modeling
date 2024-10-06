@@ -6,6 +6,7 @@ use DomainObject\DomainService\UserService;
 use DomainObject\Entity\User;
 use DomainObject\ValueObject\UserId;
 use DomainObject\ValueObject\UserName;
+use DTO\UserData;
 use Exception;
 use Repositories\IUserRepository;
 
@@ -29,11 +30,14 @@ class UserApplicationService
         $this->user_repository->save($user);
     }
 
-    public function get(string $user_id): User
+    public function get(string $user_id): UserData
     {
         $target_id = new UserId($user_id);
         $user = $this->user_repository->findId($target_id);
 
-        return $user;
+        // アプリケーションサービス以外からchangeNameメソッドを呼び出されるのを防ぐため、DTOに変換して返す
+        $user_data = new UserData($user->getId()->getValue(), $user->getName()->getValue());
+
+        return $user_data;
     }
 }
