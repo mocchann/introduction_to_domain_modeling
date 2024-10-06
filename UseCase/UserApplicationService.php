@@ -69,3 +69,14 @@ class UserApplicationService
         $this->user_repository->save($user);
     }
 }
+
+// コマンドオブジェクトを利用してアプリケーションサービスの制御を行う
+
+// ユーザー名変更だけ行う場合
+$update_name_command = new UserUpdateCommand($id, $name = "nrs");
+
+$user_application_service->update($update_name_command);
+
+// メールアドレス変更だけ行う場合
+$update_mail_address_command = new UserUpdateCommand($id, null, $mail_address = "xxxx@example.com");
+$user_application_service->update($update_mail_address_command);
