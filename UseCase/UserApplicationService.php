@@ -10,6 +10,7 @@ use DomainObject\ValueObject\UserName;
 use DTO\UserData;
 use Exception;
 use Repositories\IUserRepository;
+use UseCase\Command\UserDeleteCommand;
 use UseCase\Command\UserUpdateCommand;
 
 class UserApplicationService
@@ -67,6 +68,17 @@ class UserApplicationService
         }
 
         $this->user_repository->save($user);
+    }
+
+    public function delete(UserDeleteCommand $command): void
+    {
+        $target_id = new UserId($command->getId());
+        $user = $this->user_repository->findId($target_id);
+
+        if ($user === null) throw new Exception('User not found');
+        // return; ユーザーが見つからないときは退会成功とする判断もある
+
+        $this->user_repository->delete($user);
     }
 }
 
