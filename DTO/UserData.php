@@ -15,7 +15,7 @@ class UserData
     {
         $this->id = $user->getId()->getValue();
         $this->name = $user->getName()->getValue();
-        $this->mail_address = $user->getMailAddress()->getValue();
+        $this->mail_address = $user->getMailAddress()->getValue(); // 属性への代入処理
     }
 
     public function getId(): string
@@ -28,7 +28,7 @@ class UserData
         return $this->name;
     }
 
-    public function getMailAddress(): string
+    public function getMailAddress(): string // 追加された属性
     {
         return $this->mail_address;
     }
