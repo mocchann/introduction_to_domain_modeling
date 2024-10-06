@@ -52,10 +52,22 @@ class User
         $this->name = $name;
     }
 
+    private function setMailAddress(UserMailAddress $mail_address): void
+    {
+        $this->mail_address = $mail_address;
+    }
+
     public function changeName(UserName $name): void
     {
         if ($name === null) throw new InvalidArgumentException('Name is required');
 
         $this->setName($name);
+    }
+
+    public function changeMailAddress(UserMailAddress $mail_address): void
+    {
+        if ($mail_address === null) throw new InvalidArgumentException('Mail address is required');
+
+        $this->setMailAddress($mail_address);
     }
 }
