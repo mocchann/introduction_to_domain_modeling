@@ -10,6 +10,7 @@ use DomainObject\ValueObject\UserName;
 use DTO\UserData;
 use Exception;
 use Repositories\IUserRepository;
+use UseCase\Command\UserUpdateCommand;
 
 class UserApplicationService
 {
@@ -42,14 +43,15 @@ class UserApplicationService
         return new UserData($user);
     }
 
-    public function update(string $user_id, string $name = null, string $mail_address = null): void
+    public function update(UserUpdateCommand $command): void
     {
-        $target_id = new UserId($user_id);
+        $target_id = new UserId($command->getId());
         $user = $this->user_repository->findId($target_id);
 
         if ($user === null) throw new Exception('User not found');
 
         // メールアドレスだけを更新するため、ユーザー名が指定されないことを考慮
+        $name = $command->getName();
         if ($name !== null) {
             $new_user_name = new UserName($name);
             $user->changeName($new_user_name);
@@ -58,6 +60,7 @@ class UserApplicationService
         }
 
         // メールアドレスを更新できるように
+        $mail_address = $command->getMailAddress();
         if ($mail_address !== null) {
             $new_mail_address = new UserMailAddress($mail_address);
             $user->changeMailAddress($new_mail_address);
