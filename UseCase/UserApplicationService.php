@@ -36,9 +36,9 @@ class UserApplicationService
         $target_id = new UserId($user_id);
         $user = $this->user_repository->findId($target_id);
 
-        // アプリケーションサービス以外からchangeNameメソッドを呼び出されるのを防ぐため、DTOに変換して返す
-        $user_data = new UserData($user);
+        if ($user === null) throw new Exception('User not found');
 
-        return $user_data;
+        // アプリケーションサービス以外からchangeNameメソッドを呼び出されるのを防ぐため、DTOに変換して返す
+        return new UserData($user);
     }
 }
