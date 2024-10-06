@@ -41,4 +41,19 @@ class UserApplicationService
         // アプリケーションサービス以外からchangeNameメソッドを呼び出されるのを防ぐため、DTOに変換して返す
         return new UserData($user);
     }
+
+    public function update(string $user_id, string $name): void
+    {
+        $target_id = new UserId($user_id);
+        $user = $this->user_repository->findId($target_id);
+
+        if ($user === null) throw new Exception('User not found');
+
+        $new_user_name = new UserName($name);
+        $user->changeName($new_user_name);
+
+        if ($this->user_service->exists($user)) throw new Exception('User already exists');
+
+        $this->user_repository->save($user);
+    }
 }
