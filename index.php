@@ -1,5 +1,7 @@
 <?php
 
+namespace Chapter2to7;
+
 /**
  * Chapter2: Value Object
  */
