@@ -1184,6 +1184,19 @@ $program->createUser("nrs");
 $head = $user_repository->find(new UserName4("nrs"));
 assert($head->getName()->getValue() === "nrs");
 
+namespace BuildingSoftware;
+
+use DI\ContainerBuilder;
+
 /**
- * chapter6: Application Service
+ * chapter8: Building Software
  */
+
+require "vendor/autoload.php";
+
+class Program
+{
+    use DI\ContainerBuilder;
+
+    $container_builder = new ContainerBuilder();
+}
