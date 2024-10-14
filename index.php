@@ -1188,17 +1188,37 @@ assert($head->getName()->getValue() === "nrs");
 
 namespace BuildingSoftware;
 
-use DI\ContainerBuilder;
-
 /**
  * chapter8: Building Software
  */
 
 require "vendor/autoload.php";
 
+use Chapter2to7\InMemoryUserRepository;
+use Chapter2to7\IUserRepository;
+use Chapter2to7\UserService;
+use DI\Container;
+use DI\ContainerBuilder;
+use UseCase\UserApplicationService;
+
 class Program
 {
-    use DI\ContainerBuilder;
+    private static Container $container;
 
-    $container_builder = new ContainerBuilder();
+    public function main()
+    {
+        self::startup();
+    }
+
+    public static function startup(): void
+    {
+        $container_builder = new ContainerBuilder();
+        $container_builder->addDefinitions([
+            IUserRepository::class => \DI\autowire(InMemoryUserRepository::class),
+            UserService::class => \DI\autowire(UserService::class),
+            UserApplicationService::class => \DI\autowire(UserApplicationService::class),
+        ]);
+
+        self::$container = $container_builder->build();
+    }
 }
