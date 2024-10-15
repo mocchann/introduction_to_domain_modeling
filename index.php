@@ -1220,6 +1220,9 @@ class Program
             $user_application_service->register($user_name, $mail_address);
 
             echo "ユーザーを登録しました" . "\n";
+            echo "続けて登録しますか？(y/n)" . "\n";
+            $continue = trim(fgets(STDIN));
+            if ($continue !== "y") break;
         }
     }
 
