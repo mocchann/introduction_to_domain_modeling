@@ -1,5 +1,7 @@
 <?php
 
+namespace Chapter2to7;
+
 /**
  * Chapter2: Value Object
  */
@@ -1184,6 +1186,55 @@ $program->createUser("nrs");
 $head = $user_repository->find(new UserName4("nrs"));
 assert($head->getName()->getValue() === "nrs");
 
+namespace BuildingSoftware;
+
 /**
- * chapter6: Application Service
+ * chapter8: Building Software
  */
+
+require "vendor/autoload.php";
+
+use Chapter2to7\InMemoryUserRepository;
+use Chapter2to7\IUserRepository;
+use Chapter2to7\UserService;
+use DI\Container;
+use DI\ContainerBuilder;
+use UseCase\UserApplicationService;
+
+class Program
+{
+    private static Container $container;
+
+    public function main()
+    {
+        self::startup();
+
+        while (true) {
+            echo "ユーザー名を入力してください" . "\n";
+            $user_name = trim(fgets(STDIN));
+
+            echo "メールアドレスを入力してください" . "\n";
+            $mail_address = trim(fgets(STDIN));
+
+            $user_application_service = self::$container->get(UserApplicationService::class);
+            $user_application_service->register($user_name, $mail_address);
+
+            echo "ユーザーを登録しました" . "\n";
+            echo "続けて登録しますか？(y/n)" . "\n";
+            $continue = trim(fgets(STDIN));
+            if ($continue !== "y") break;
+        }
+    }
+
+    public static function startup(): void
+    {
+        $container_builder = new ContainerBuilder();
+        $container_builder->addDefinitions([
+            IUserRepository::class => \DI\autowire(InMemoryUserRepository::class),
+            UserService::class => \DI\autowire(UserService::class),
+            UserApplicationService::class => \DI\autowire(UserApplicationService::class),
+        ]);
+
+        self::$container = $container_builder->build();
+    }
+}

@@ -2,6 +2,7 @@
     "name": "root/html",
     "require": {
         "illuminate/database": "^11.26",
-        "illuminate/events": "^11.26"
+        "illuminate/events": "^11.26",
+        "php-di/php-di": "^7.0"
     }
 }
