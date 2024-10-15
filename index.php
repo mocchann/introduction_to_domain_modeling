@@ -1208,6 +1208,19 @@ class Program
     public function main()
     {
         self::startup();
+
+        while (true) {
+            echo "ユーザー名を入力してください" . "\n";
+            $user_name = trim(fgets(STDIN));
+
+            echo "メールアドレスを入力してください" . "\n";
+            $mail_address = trim(fgets(STDIN));
+
+            $user_application_service = self::$container->get(UserApplicationService::class);
+            $user_application_service->register($user_name, $mail_address);
+
+            echo "ユーザーを登録しました" . "\n";
+        }
     }
 
     public static function startup(): void
