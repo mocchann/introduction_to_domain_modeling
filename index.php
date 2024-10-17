@@ -1249,6 +1249,11 @@ use Chapter2to7\UserId;
 use Chapter2to7\UserName;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 
+interface IUserFactory
+{
+    public function create(UserName $name): User;
+}
+
 class User
 {
     private readonly UserId $id;
