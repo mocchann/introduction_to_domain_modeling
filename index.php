@@ -1238,3 +1238,40 @@ class Program
         self::$container = $container_builder->build();
     }
 }
+
+/**
+ * Chapter9: Factory
+ */
+
+namespace Factory;
+
+use Chapter2to7\UserId;
+use Chapter2to7\UserName;
+use Symfony\Component\Translation\Exception\InvalidArgumentException;
+
+class User
+{
+    private readonly UserId $id;
+    private readonly UserName $name;
+
+    public function __construct(UserName $name)
+    {
+        if ($name === null) throw new InvalidArgumentException("ユーザー名は必須です");
+
+        $id = new UserId(uniqid());
+        $this->name = $name;
+    }
+
+    public function updateUser(UserId $id, UserName $name)
+    {
+        if ($id === null) throw new InvalidArgumentException("ユーザーIDは必須です");
+        if ($name === null) throw new InvalidArgumentException("ユーザー名は必須です");
+
+        $user = new self($name);
+        $user->id = $id;
+
+        return $user;
+    }
+
+    // ...略
+}
