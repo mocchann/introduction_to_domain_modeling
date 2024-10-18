@@ -1247,6 +1247,7 @@ namespace Factory;
 
 use Chapter2to7\UserId;
 use Chapter2to7\UserName;
+use PDO;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 
 interface IUserFactory
@@ -1254,28 +1255,35 @@ interface IUserFactory
     public function create(UserName $name): User;
 }
 
+// シーケンスを利用したファクトリ
+class UserFactory implements IUserFactory
+{
+    public function create(UserName $name): User
+    {
+        $seq_id = "";
+
+        $connectionString = "mysql:host=localhost;dbname=test";
+        $connection = new PDO($connectionString, "my_db_username", "my_db_password");
+        $command = $connection->prepare("SELECT nextval('user_id_seq')");
+        // ...略
+
+        $id = new UserId($seq_id);
+        return new User($id, $name);
+    }
+}
+
 class User
 {
     private readonly UserId $id;
     private readonly UserName $name;
 
-    public function __construct(UserName $name)
-    {
-        if ($name === null) throw new InvalidArgumentException("ユーザー名は必須です");
-
-        $id = new UserId(uniqid());
-        $this->name = $name;
-    }
-
-    public function updateUser(UserId $id, UserName $name)
+    public function __construct(UserId $id, UserName $name)
     {
         if ($id === null) throw new InvalidArgumentException("ユーザーIDは必須です");
         if ($name === null) throw new InvalidArgumentException("ユーザー名は必須です");
 
-        $user = new self($name);
-        $user->id = $id;
-
-        return $user;
+        $this->id = $id;
+        $this->name = $name;
     }
 
     // ...略
