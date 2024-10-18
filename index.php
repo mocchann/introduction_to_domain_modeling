@@ -1272,6 +1272,7 @@ class UserFactory implements IUserFactory
     }
 }
 
+// ファクトリを用いればUserのコンストラクタはひとつになる
 class User
 {
     private readonly UserId $id;
