@@ -1321,3 +1321,19 @@ class UserApplicationService
         $this->user_repository->save($user);
     }
 }
+
+// registerをテストする際はDB接続しないでインメモリでテストしたい
+class InMemoryUserFactory implements IUserFactory
+{
+    private int $current_id;
+
+    public function create(UserName $name): User
+    {
+        $this->current_id++;
+
+        return new User(
+            new UserId((string)$this->current_id),
+            $name
+        );
+    }
+}
