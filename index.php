@@ -1311,7 +1311,7 @@ class UserApplicationService
     public function register(UserRegisterCommand $command): void
     {
         $user_name = new UserName($command->getName());
-        // ファクトリによってインスタンスを生成する
+        // ファクトリを経由してインスタンスを生成する
         $user = $this->user_factory->create($user_name);
 
         if ($this->user_service->exists($user)) {
