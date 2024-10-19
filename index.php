@@ -1352,3 +1352,7 @@ class User
         return new Circle($this->id, $circle_name);
     }
 }
+
+/**
+ * Chapter10: Transaction
+ */
