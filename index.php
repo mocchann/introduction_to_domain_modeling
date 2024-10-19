@@ -1337,3 +1337,18 @@ class InMemoryUserFactory implements IUserFactory
         );
     }
 }
+
+// サークルにはそのオーナーとなるユーザーがいる、オーナーの目印にユーザーIDを持たせる
+$circle = new Circle($user->getId(), new CircleName("my circle"));
+
+class User
+{
+    private readonly UserId $id;
+
+    // ...略
+
+    public function createCircle(CircleName $circle_name): Circle
+    {
+        return new Circle($this->id, $circle_name);
+    }
+}
