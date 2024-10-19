@@ -1238,3 +1238,117 @@ class Program
         self::$container = $container_builder->build();
     }
 }
+
+/**
+ * Chapter9: Factory
+ */
+
+namespace Factory;
+
+use Chapter2to7\IUserRepository;
+use Chapter2to7\UserId;
+use Chapter2to7\UserName;
+use Chapter2to7\UserService;
+use Exception;
+use PDO;
+use Symfony\Component\Translation\Exception\InvalidArgumentException;
+use UseCase\Command\UserRegisterCommand;
+
+interface IUserFactory
+{
+    public function create(UserName $name): User;
+}
+
+// シーケンスを利用したファクトリ
+class UserFactory implements IUserFactory
+{
+    public function create(UserName $name): User
+    {
+        $seq_id = "";
+
+        $connectionString = "mysql:host=localhost;dbname=test";
+        $connection = new PDO($connectionString, "my_db_username", "my_db_password");
+        $command = $connection->prepare("SELECT nextval('user_id_seq')");
+        // ...略
+
+        $id = new UserId($seq_id);
+        return new User($id, $name);
+    }
+}
+
+// ファクトリを用いればUserのコンストラクタはひとつになる
+class User
+{
+    private readonly UserId $id;
+    private readonly UserName $name;
+
+    public function __construct(UserId $id, UserName $name)
+    {
+        if ($id === null) throw new InvalidArgumentException("ユーザーIDは必須です");
+        if ($name === null) throw new InvalidArgumentException("ユーザー名は必須です");
+
+        $this->id = $id;
+        $this->name = $name;
+    }
+
+    // ...略
+}
+
+// ファクトリを利用するUserApplicationService
+class UserApplicationService
+{
+    private readonly IUserFactory $user_factory;
+    private readonly IUserRepository $user_repository;
+    private readonly UserService $user_service;
+
+    public function __construct(IUserFactory $user_factory, IUserRepository $user_repository, UserService $user_service)
+    {
+        $this->user_factory = $user_factory;
+        $this->user_repository = $user_repository;
+        $this->user_service = $user_service;
+    }
+
+    public function register(UserRegisterCommand $command): void
+    {
+        $user_name = new UserName($command->getName());
+        // ファクトリを経由してインスタンスを生成する
+        $user = $this->user_factory->create($user_name);
+
+        if ($this->user_service->exists($user)) {
+            throw new Exception($user . "は既に存在しています");
+        }
+
+        $this->user_repository->save($user);
+    }
+}
+
+// registerをテストする際はDB接続しないでインメモリでテストしたい
+class InMemoryUserFactory implements IUserFactory
+{
+    private int $current_id;
+
+    public function create(UserName $name): User
+    {
+        $this->current_id++;
+
+        return new User(
+            new UserId((string)$this->current_id),
+            $name
+        );
+    }
+}
+
+// サークルにはそのオーナーとなるユーザーがいる、オーナーの目印にユーザーIDを持たせる
+$circle = new Circle($user->getId(), new CircleName("my circle"));
+
+class User
+{
+    private readonly UserId $id;
+
+    // ...略
+
+    public function createCircle(CircleName $circle_name): Circle
+    {
+        return new Circle($this->id, $circle_name);
+    }
+}
