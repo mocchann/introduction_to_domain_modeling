@@ -3,7 +3,7 @@
 namespace DomainObject\DomainService;
 
 use DomainObject\Entity\User;
-use Repositories\IUserRepository;
+use Repository\IUserRepository;
 
 class UserService
 {
