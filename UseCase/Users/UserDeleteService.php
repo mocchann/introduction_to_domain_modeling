@@ -4,7 +4,7 @@ namespace UseCase;
 
 use DomainObject\ValueObject\UserId;
 use Exception;
-use Repositories\IUserRepository;
+use Repository\IUserRepository;
 use UseCase\Command\UserDeleteCommand;
 
 class UserDeleteService
