@@ -6,9 +6,7 @@ use Symfony\Component\Translation\Exception\InvalidArgumentException;
 
 class UserMailAddress
 {
-    private $value;
-
-    public function __construct(string $value)
+    public function __construct(private string $value)
     {
         if (!$value) throw new InvalidArgumentException('Mail Address is required');
 
