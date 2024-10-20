@@ -14,13 +14,12 @@ use UseCase\Command\UserRegisterCommand;
 
 class UserRegisterService implements IUserRegisterService
 {
-    private readonly PDO $connection;
-    private readonly UserService $user_service;
-    private readonly IUserFactory $user_factory;
-    private readonly IUserRepository $user_repository;
-
-    public function __construct(PDO $connection, UserService $user_service, IUserFactory $user_factory, IUserRepository $user_repository)
-    {
+    public function __construct(
+        private readonly PDO $connection,
+        private readonly UserService $user_service,
+        private readonly IUserFactory $user_factory,
+        private readonly IUserRepository $user_repository
+    ) {
         $this->connection = $connection;
         $this->user_service = $user_service;
         $this->user_factory = $user_factory;

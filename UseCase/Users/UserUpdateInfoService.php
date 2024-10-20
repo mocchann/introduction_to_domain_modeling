@@ -12,11 +12,10 @@ use UseCase\Command\UserUpdateCommand;
 
 class UserUpdateInfoService
 {
-    private readonly IUserRepository $user_repository;
-    private readonly UserService $user_service;
-
-    public function __construct(IUserRepository $user_repository, UserService $user_service)
-    {
+    public function __construct(
+        private readonly IUserRepository $user_repository,
+        private readonly UserService $user_service
+    ) {
         $this->user_repository = $user_repository;
         $this->user_service = $user_service;
     }
