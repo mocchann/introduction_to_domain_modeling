@@ -10,7 +10,7 @@ use Repository\IUserRepository;
 use Exception;
 use UseCase\Command\UserRegisterCommand;
 
-class UserRegisterService
+class UserRegisterService implements IUserRegisterService
 {
     private readonly IUserFactory $user_factory;
     private readonly IUserRepository $user_repository;
