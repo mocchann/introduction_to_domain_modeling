@@ -70,34 +70,18 @@ class UserRepository implements IUserRepository
 
     public function save(User $user, ?PDO $transaction = null): void
     {
-        try {
-            if ($transaction !== null) {
-                $this->connection->beginTransaction();
-            }
-
-            $sql = "
+        $sql = "
                 INSERT INTO users (id, name)
                 VALUES (:id, :name)
                 ON DUPLICATE KEY UPDATE
                 name = VALUES(name);
             ";
 
-            $stmt = $this->connection->prepare($sql);
-            $stmt->bindValue(':id', $user->getId()->getValue(), PDO::PARAM_STR);
-            $stmt->bindValue(':name', $user->getName()->getValue(), PDO::PARAM_STR);
+        $stmt = $this->connection->prepare($sql);
+        $stmt->bindValue(':id', $user->getId()->getValue(), PDO::PARAM_STR);
+        $stmt->bindValue(':name', $user->getName()->getValue(), PDO::PARAM_STR);
 
-            $stmt->execute();
-
-            if ($transaction !== null) {
-                $this->connection->commit();
-            }
-        } catch (PDOException $e) {
-            if ($transaction !== null) {
-                $this->connection->rollBack();
-            }
-
-            throw $e;
-        }
+        $stmt->execute();
     }
 
     public function delete(User $user): void
