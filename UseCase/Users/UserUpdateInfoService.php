@@ -7,7 +7,7 @@ use DomainObject\ValueObject\UserId;
 use DomainObject\ValueObject\UserMailAddress;
 use DomainObject\ValueObject\UserName;
 use Exception;
-use Repositories\IUserRepository;
+use Repository\IUserRepository;
 use UseCase\Command\UserUpdateCommand;
 
 class UserUpdateInfoService
