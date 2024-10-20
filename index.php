@@ -1361,9 +1361,11 @@ namespace Transaction;
 
 use Chapter2to7\IUserRepository;
 use Chapter2to7\UserName;
+use Chapter2to7\UserRepository;
 use Chapter2to7\UserService;
 use Exception;
 use Factory\IUserFactory;
+use PDO;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use UseCase\Command\UserRegisterCommand;
 
@@ -1457,5 +1459,31 @@ class UserApplicationService
 
         $this->user_repository->save($user);
         $this->uow->commit();
+    }
+}
+
+// リポジトリに変更の追跡を移譲したユニットオブワーク
+class UnitOfWork implements IUnitOfWork
+{
+    public function __construct(
+        private readonly PDO $connection,
+        private UserRepository $user_repository,
+    ) {
+        $this->connection = $connection;
+        $this->user_repository = $user_repository;
+    }
+
+    public function getUserRepository(): UserRepository
+    {
+        if ($this->user_repository === null) {
+            $this->user_repository = new UserRepository($this->connection);
+        }
+
+        return $this->user_repository;
+    }
+
+    public function commit(): void
+    {
+        $this->connection->commit();
     }
 }
