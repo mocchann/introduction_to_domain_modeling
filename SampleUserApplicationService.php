@@ -9,11 +9,11 @@ use DomainObject\ValueObject\UserMailAddress;
 use DomainObject\ValueObject\UserName;
 use DTO\UserData;
 use Exception;
-use Repositories\IUserRepository;
+use Repository\IUserRepository;
 use UseCase\Command\UserDeleteCommand;
 use UseCase\Command\UserUpdateCommand;
 
-class UserApplicationService
+class SampleUserApplicationService
 {
     private readonly IUserRepository $user_repository;
     private readonly UserService $user_service;
@@ -24,9 +24,9 @@ class UserApplicationService
         $this->user_service = $user_service;
     }
 
-    public function register(string $name, string $mail_address): void
+    public function register(string $id, string $name, string $mail_address): void
     {
-        $user = new User(new UserName($name), new UserMailAddress($mail_address));
+        $user = new User(new UserId($id), new UserName($name), new UserMailAddress($mail_address));
 
         if ($this->user_service->exists($user)) throw new Exception('User already exists');
 

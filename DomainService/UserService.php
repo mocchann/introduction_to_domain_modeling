@@ -3,13 +3,11 @@
 namespace DomainObject\DomainService;
 
 use DomainObject\Entity\User;
-use Repositories\IUserRepository;
+use Repository\IUserRepository;
 
 class UserService
 {
-    private readonly IUserRepository $user_repository;
-
-    public function __construct(IUserRepository $user_repository)
+    public function __construct(private readonly IUserRepository $user_repository)
     {
         $this->user_repository = $user_repository;
     }

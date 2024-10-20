@@ -4,14 +4,12 @@ namespace UseCase;
 
 use DomainObject\ValueObject\UserId;
 use Exception;
-use Repositories\IUserRepository;
+use Repository\IUserRepository;
 use UseCase\Command\UserDeleteCommand;
 
 class UserDeleteService
 {
-    private readonly IUserRepository $user_repository;
-
-    public function __construct(IUserRepository $user_repository)
+    public function __construct(private readonly IUserRepository $user_repository)
     {
         $this->user_repository = $user_repository;
     }

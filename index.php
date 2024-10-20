@@ -1352,3 +1352,138 @@ class User
         return new Circle($this->id, $circle_name);
     }
 }
+
+/**
+ * Chapter10: Transaction
+ */
+
+namespace Transaction;
+
+use Chapter2to7\IUserRepository;
+use Chapter2to7\UserName;
+use Chapter2to7\UserRepository;
+use Chapter2to7\UserService;
+use Exception;
+use Factory\IUserFactory;
+use PDO;
+use Symfony\Component\Translation\Exception\InvalidArgumentException;
+use UseCase\Command\UserRegisterCommand;
+
+// ユニットオブワークを利用したトランザクション
+class UnitOfWork
+{
+    public static function registerNew(object $value): void {}
+    public static function registerDirty(object $value): void {}
+    public static function registerClean(object $value): void {}
+    public static function registerDeleted(object $value): void {}
+    public static function commit(): void {}
+}
+
+// マーキングのための手段を提供するエンティティの基底クラス
+abstract class Entity
+{
+    protected function markNew(): void
+    {
+        UnitOfWork::registerNew($this);
+    }
+
+    protected function markDirty(): void
+    {
+        UnitOfWork::registerDirty($this);
+    }
+
+    protected function markClean(): void
+    {
+        UnitOfWork::registerClean($this);
+    }
+
+    protected function markDeleted(): void
+    {
+        UnitOfWork::registerDeleted($this);
+    }
+}
+
+// エンティティは↑を継承し、データ変更時などに適宜マーキング作業を行う
+class User extends Entity
+{
+    public function __construct(private UserName $name)
+    {
+        if ($name === null) throw new InvalidArgumentException("ユーザー名は必須です");
+
+        $this->name = $name;
+        $this->markNew();
+    }
+
+    public function getName(): UserName
+    {
+        return $this->name;
+    }
+
+    private function setName(UserName $name): void
+    {
+        $this->name = $name;
+    }
+
+    public function changeName(UserName $name): void
+    {
+        if ($name === null) throw new InvalidArgumentException("ユーザー名は必須です");
+
+        $this->name = $name;
+        $this->markDirty();
+    }
+}
+
+// ユニットオブワークを利用したトランザクションの実装
+class UserApplicationService
+{
+    public function __construct(
+        private readonly UnitOfWork $uow,
+        private readonly UserService $user_service,
+        private readonly IUserFactory $user_factory,
+        private readonly IUserRepository $user_repository,
+    ) {
+        $this->uow = $uow;
+        $this->user_service = $user_service;
+        $this->user_factory = $user_factory;
+        $this->user_repository = $user_repository;
+    }
+
+    public function register(UserRegisterCommand $command): void
+    {
+        $user_name = new UserName($command->getName());
+        $user = $this->user_factory->create($user_name);
+
+        if ($this->user_service->exists($user)) {
+            throw new Exception($user . "は既に存在しています");
+        }
+
+        $this->user_repository->save($user);
+        $this->uow->commit();
+    }
+}
+
+// リポジトリに変更の追跡を移譲したユニットオブワーク
+class UnitOfWork implements IUnitOfWork
+{
+    public function __construct(
+        private readonly PDO $connection,
+        private UserRepository $user_repository,
+    ) {
+        $this->connection = $connection;
+        $this->user_repository = $user_repository;
+    }
+
+    public function getUserRepository(): UserRepository
+    {
+        if ($this->user_repository === null) {
+            $this->user_repository = new UserRepository($this->connection);
+        }
+
+        return $this->user_repository;
+    }
+
+    public function commit(): void
+    {
+        $this->connection->commit();
+    }
+}

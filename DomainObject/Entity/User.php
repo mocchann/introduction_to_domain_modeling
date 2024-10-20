@@ -9,27 +9,18 @@ use Symfony\Component\Translation\Exception\InvalidArgumentException;
 
 class User
 {
-    private $id;
-    private $name;
-    private $mail_address;
-
-    public function __construct(UserName $name, UserMailAddress $mail_address)
-    {
-        if ($name === null) throw new InvalidArgumentException('Name is required');
-
-        $this->id = new UserId(uniqid());
-        $this->name = $name;
-        $this->mail_address = $mail_address;
-    }
-
-    public static function reconstruct(UserId $id, UserName $name, UserMailAddress $mail_address): User
-    {
+    public function __construct(
+        private UserId $id,
+        private UserName $name,
+        private UserMailAddress $mail_address
+    ) {
         if ($id === null) throw new InvalidArgumentException('Id is required');
         if ($name === null) throw new InvalidArgumentException('Name is required');
+        if ($mail_address === null) throw new InvalidArgumentException('Mail address is required');
 
-        $user = new self($name, $mail_address);
-        $user->id = $id;
-        return $user;
+        $this->id = $id;
+        $this->name = $name;
+        $this->mail_address = $mail_address;
     }
 
     public function getId(): UserId
