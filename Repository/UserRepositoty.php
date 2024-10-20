@@ -11,9 +11,7 @@ use PDOException;
 
 class UserRepository implements IUserRepository
 {
-    private readonly PDO $connection;
-
-    public function __construct(PDO $connection)
+    public function __construct(private readonly PDO $connection)
     {
         $this->connection = $connection;
     }
