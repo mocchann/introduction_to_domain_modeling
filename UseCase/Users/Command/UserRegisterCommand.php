@@ -4,11 +4,10 @@ namespace UseCase\Command;
 
 class UserRegisterCommand
 {
-    private string $name;
-    private string $mail_address;
-
-    public function __construct(string $name, string $mail_address)
-    {
+    public function __construct(
+        private string $name,
+        private string $mail_address
+    ) {
         $this->name = $name;
         $this->mail_address = $mail_address;
     }
