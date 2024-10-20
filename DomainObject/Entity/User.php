@@ -9,12 +9,11 @@ use Symfony\Component\Translation\Exception\InvalidArgumentException;
 
 class User
 {
-    private $id;
-    private $name;
-    private $mail_address;
-
-    public function __construct(UserId $id, UserName $name, UserMailAddress $mail_address)
-    {
+    public function __construct(
+        private UserId $id,
+        private UserName $name,
+        private UserMailAddress $mail_address
+    ) {
         if ($id === null) throw new InvalidArgumentException('Id is required');
         if ($name === null) throw new InvalidArgumentException('Name is required');
         if ($mail_address === null) throw new InvalidArgumentException('Mail address is required');
