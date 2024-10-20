@@ -8,7 +8,7 @@ use DomainObject\ValueObject\UserMailAddress;
 use DomainObject\ValueObject\UserName;
 use PDO;
 
-class UserFactory
+class UserFactory implements IUserFactory
 {
     public function create(UserName $name, UserMailAddress $mail_address): User
     {
