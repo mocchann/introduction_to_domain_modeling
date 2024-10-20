@@ -5,7 +5,7 @@ namespace UseCase;
 use DomainObject\ValueObject\UserId;
 use DTO\UserData;
 use Exception;
-use Repositories\IUserRepository;
+use Repository\IUserRepository;
 
 class UserGetInfoService
 {
