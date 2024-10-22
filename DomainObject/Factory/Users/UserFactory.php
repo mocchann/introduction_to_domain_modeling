@@ -1,11 +1,11 @@
 <?php
 
-namespace DomainObject\Factory;
+namespace DomainObject\Factory\Users;
 
-use DomainObject\Entity\User;
-use DomainObject\ValueObject\UserId;
-use DomainObject\ValueObject\UserMailAddress;
-use DomainObject\ValueObject\UserName;
+use DomainObject\Entity\Users\User;
+use DomainObject\ValueObject\Users\UserId;
+use DomainObject\ValueObject\Users\UserMailAddress;
+use DomainObject\ValueObject\Users\UserName;
 use PDO;
 
 class UserFactory implements IUserFactory
