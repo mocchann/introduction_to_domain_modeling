@@ -2,12 +2,12 @@
 
 namespace UseCase;
 
-use DomainObject\DomainService\UserService;
-use DomainObject\ValueObject\UserId;
-use DomainObject\ValueObject\UserMailAddress;
-use DomainObject\ValueObject\UserName;
+use DomainObject\DomainService\Users\UserService;
+use DomainObject\ValueObject\Users\UserId;
+use DomainObject\ValueObject\Users\UserMailAddress;
+use DomainObject\ValueObject\Users\UserName;
 use Exception;
-use Repository\IUserRepository;
+use Repository\Users\IUserRepository;
 use UseCase\Command\UserUpdateCommand;
 
 class UserUpdateInfoService

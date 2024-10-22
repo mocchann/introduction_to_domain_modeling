@@ -2,10 +2,10 @@
 
 namespace UseCase;
 
-use DomainObject\ValueObject\UserId;
-use DTO\UserData;
+use DomainObject\ValueObject\Users\UserId;
+use DTO\Users\UserData;
 use Exception;
-use Repository\IUserRepository;
+use Repository\Users\IUserRepository;
 
 class UserGetInfoService
 {

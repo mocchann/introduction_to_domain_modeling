@@ -1,10 +1,10 @@
 <?php
 
-namespace Repository;
+namespace Repository\Users;
 
-use DomainObject\Entity\User;
-use DomainObject\ValueObject\UserId;
-use DomainObject\ValueObject\UserName;
+use DomainObject\Entity\Users\User;
+use DomainObject\ValueObject\Users\UserId;
+use DomainObject\ValueObject\Users\UserName;
 
 interface IUserRepository
 {

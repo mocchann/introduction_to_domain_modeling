@@ -1,8 +1,8 @@
 <?php
 
-namespace DTO;
+namespace DTO\Users;
 
-use DomainObject\Entity\User;
+use DomainObject\Entity\Users\User;
 
 class UserData
 {
