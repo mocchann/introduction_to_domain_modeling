@@ -1,10 +1,10 @@
 <?php
 
-namespace DomainObject\Entity;
+namespace DomainObject\Entity\Users;
 
-use DomainObject\ValueObject\UserId;
-use DomainObject\ValueObject\UserMailAddress;
-use DomainObject\ValueObject\UserName;
+use DomainObject\ValueObject\Users\UserId;
+use DomainObject\ValueObject\Users\UserMailAddress;
+use DomainObject\ValueObject\Users\UserName;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 
 class User
