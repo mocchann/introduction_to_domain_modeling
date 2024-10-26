@@ -56,8 +56,16 @@ class Circle
         return $this->members;
     }
 
-    private function addMember(User $member): void
+    private function setMember(User $member): void
     {
         $this->members[] = $member;
+    }
+
+    public function addMember(User $member): void
+    {
+        if ($member === null) throw new InvalidArgumentException('Member is required');
+        if (in_array($member, $this->members)) throw new InvalidArgumentException('Member already exists');
+
+        $this->setMember($member);
     }
 }
