@@ -16,4 +16,9 @@ class CircleJoinCommand
     {
         return $this->circle_id;
     }
+
+    public function getUserId(): string
+    {
+        return $this->user_id;
+    }
 }
