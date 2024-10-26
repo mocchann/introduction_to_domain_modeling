@@ -56,7 +56,7 @@ class Circle
         return $this->members;
     }
 
-    public function addMember(User $member): void
+    private function addMember(User $member): void
     {
         $this->members[] = $member;
     }
