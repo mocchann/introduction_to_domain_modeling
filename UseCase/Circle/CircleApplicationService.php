@@ -3,6 +3,7 @@
 namespace UseCase\Circle;
 
 use DomainObject\Factory\Circle\ICircleFactory;
+use DomainObject\ValueObject\Circle\CircleId;
 use DomainObject\ValueObject\Circle\CircleName;
 use DomainObject\ValueObject\Users\UserId;
 use DomainService\Circle\CircleService;
@@ -11,6 +12,7 @@ use PDO;
 use Repository\Circle\ICircleRepository;
 use Repository\Users\IUserRepository;
 use UseCase\Circle\Command\CircleCreateCommand;
+use UseCase\Circle\Command\CircleJoinCommand;
 
 class CircleApplicationService
 {
@@ -33,8 +35,8 @@ class CircleApplicationService
         try {
             $this->pdo->beginTransaction();
 
-            $ownerId = new UserId($command->getUserId());
-            $owner = $this->user_repository->findId($ownerId);
+            $owner_id = new UserId($command->getUserId());
+            $owner = $this->user_repository->findId($owner_id);
             if ($owner === null) {
                 throw new Exception('User not found');
             }
@@ -51,5 +53,30 @@ class CircleApplicationService
             $this->pdo->rollBack();
             throw $e;
         }
+    }
+
+    public function join(CircleJoinCommand $command): void
+    {
+        $this->pdo->beginTransaction();
+
+        $member_id = new UserId($command->getUserId());
+        $member = $this->user_repository->findId($member_id);
+        if ($member_id === null) {
+            throw new Exception('User not found');
+        }
+
+        $id = new CircleId($command->getCircleId());
+        $circle = $this->circle_repository->findById($id);
+        if ($circle === null) {
+            throw new Exception('Circle not found');
+        }
+
+        if (count($circle->getMembers()) >= 29) {
+            throw new Exception('Circle is full');
+        }
+        $circle->addMember($member);
+        $this->circle_repository->save($circle);
+
+        $this->pdo->commit();
     }
 }
