@@ -5,7 +5,7 @@ namespace DomainObject\Entity\Circle;
 use DomainObject\ValueObject\Circle\CircleId;
 use DomainObject\ValueObject\Circle\CircleName;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
-use User;
+use DomainObject\Entity\Users\User;
 
 class Circle
 {
@@ -54,5 +54,10 @@ class Circle
     public function getMembers(): array
     {
         return $this->members;
+    }
+
+    public function addMember(User $member): void
+    {
+        $this->members[] = $member;
     }
 }
