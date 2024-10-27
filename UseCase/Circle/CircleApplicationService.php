@@ -49,7 +49,7 @@ class CircleApplicationService
             $this->circle_repository->save($circle);
 
             $this->pdo->commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->pdo->rollBack();
             throw $e;
         }
