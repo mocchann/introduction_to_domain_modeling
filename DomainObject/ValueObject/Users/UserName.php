@@ -1,6 +1,6 @@
 <?php
 
-namespace DomainObject\ValueObject;
+namespace DomainObject\ValueObject\Users;
 
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 

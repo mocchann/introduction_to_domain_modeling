@@ -2,9 +2,9 @@
 
 namespace UseCase;
 
-use DomainObject\ValueObject\UserId;
+use DomainObject\ValueObject\Users\UserId;
 use Exception;
-use Repository\IUserRepository;
+use Repository\Users\IUserRepository;
 use UseCase\Command\UserDeleteCommand;
 
 class UserDeleteService

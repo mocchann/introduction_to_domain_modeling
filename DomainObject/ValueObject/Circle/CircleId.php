@@ -1,10 +1,10 @@
 <?php
 
-namespace DomainObject\ValueObject;
+namespace DomainObject\ValueObject\Circle;
 
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 
-class UserId
+class CircleId
 {
     public function __construct(private string $value)
     {

@@ -1,6 +1,6 @@
 <?php
 
-namespace UseCase;
+namespace UseCase\Users;
 
 use UseCase\Command\UserRegisterCommand;
 

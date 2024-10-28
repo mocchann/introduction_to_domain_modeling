@@ -1,14 +1,14 @@
 <?php
 
-namespace DomainObject\ValueObject;
+namespace DomainObject\ValueObject\Users;
 
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 
-class UserMailAddress
+class UserId
 {
     public function __construct(private string $value)
     {
-        if (!$value) throw new InvalidArgumentException('Mail Address is required');
+        if (!$value) throw new InvalidArgumentException('Id is required');
 
         $this->value = $value;
     }

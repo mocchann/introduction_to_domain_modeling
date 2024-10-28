@@ -1,15 +1,15 @@
 <?php
 
-namespace UseCase;
+namespace UseCase\Users;
 
-use DomainObject\DomainService\UserService;
-use DomainObject\Factory\IUserFactory;
-use DomainObject\ValueObject\UserMailAddress;
-use DomainObject\ValueObject\UserName;
-use Repository\IUserRepository;
+use DomainObject\DomainService\Users\UserService;
+use DomainObject\Factory\Users\IUserFactory;
+use DomainObject\ValueObject\Users\UserMailAddress;
+use DomainObject\ValueObject\Users\UserName;
 use Exception;
 use PDO;
 use PDOException;
+use Repository\Users\IUserRepository;
 use UseCase\Command\UserRegisterCommand;
 
 class UserRegisterService implements IUserRegisterService
