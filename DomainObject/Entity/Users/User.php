@@ -5,12 +5,13 @@ namespace DomainObject\Entity\Users;
 use DomainObject\ValueObject\Users\UserId;
 use DomainObject\ValueObject\Users\UserMailAddress;
 use DomainObject\ValueObject\Users\UserName;
+use Repository\Users\IUserNotification;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 
 class User
 {
     public function __construct(
-        private UserId $id,
+        private readonly UserId $id,
         private UserName $name,
         private UserMailAddress $mail_address
     ) {
@@ -60,5 +61,12 @@ class User
         if ($mail_address === null) throw new InvalidArgumentException('Mail address is required');
 
         $this->setMailAddress($mail_address);
+    }
+
+    public function notify(IUserNotification $note): void
+    {
+        // 内部データを通知
+        $note->notifyId($this->getId());
+        $note->notifyName($this->getName());
     }
 }
