@@ -71,10 +71,7 @@ class CircleApplicationService
             throw new Exception('Circle not found');
         }
 
-        if (count($circle->getMembers()) >= 29) {
-            throw new Exception('Circle is full');
-        }
-        $circle->addMember($member);
+        $circle->join($member);
         $this->circle_repository->save($circle);
 
         $this->pdo->commit();

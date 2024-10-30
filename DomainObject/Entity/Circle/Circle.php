@@ -61,10 +61,21 @@ class Circle
         $this->members[] = $member;
     }
 
-    public function addMember(User $member): void
+    public function isFull(): bool
+    {
+        return $this->countMembers() >= 30;
+    }
+
+    public function countMembers(): int
+    {
+        return $this->members + 1;
+    }
+
+    public function join(User $member): void
     {
         if ($member === null) throw new InvalidArgumentException('Member is required');
         if (in_array($member, $this->members)) throw new InvalidArgumentException('Member already exists');
+        if ($this->isFull()) throw new InvalidArgumentException('Circle is full');
 
         $this->setMember($member);
     }
