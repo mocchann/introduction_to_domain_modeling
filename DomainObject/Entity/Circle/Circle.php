@@ -63,7 +63,12 @@ class Circle
 
     public function isFull(): bool
     {
-        return count($this->members) >= 29;
+        return $this->countMembers() >= 30;
+    }
+
+    public function countMembers(): int
+    {
+        return $this->members + 1;
     }
 
     public function join(User $member): void
