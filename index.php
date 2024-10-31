@@ -1495,6 +1495,7 @@ class UnitOfWork implements IUnitOfWork
 namespace Evaluation;
 
 use Chapter2to7\IUserRepository;
+use DateTime;
 use DomainObject\ValueObject\Circle\CircleId;
 use Exception;
 use Repository\Circle\ICircleRepository;
@@ -1597,3 +1598,62 @@ class CircleApplicationService
 }
 
 // このように仕様オブジェクトを用意することで、複雑な評価手順はカプセル化され、コードの意図が明確になる
+
+// おすすめサークルの検索機能
+interface ICircleRepository
+{
+    // ...略
+    public function findRecommended(DateTime $now): array;
+}
+
+// おすすめサークルを探すサービスの処理
+class CircleApplicationService
+{
+    private readonly DateTime $now;
+
+    // ...略
+
+    public function getRecommend(CircleGetRecommendRequest $request): CircleGetRecommendResult
+    {
+        // リポジトリに依頼するだけ
+        $recommend_circles = $this->circle_repository->findRecommended($this->now);
+
+        return new CircleGetRecommendResult($recommend_circles);
+    }
+}
+
+// この実装でも正しく動作するが、ドメインの重要なルール(おすすめサークル検索)がインフラストラクチャの領域に染み出している
+// ドメインの重要な知識はドメインのオブジェクトとして表現すべきなので
+// おすすめサークルかどうかを判断する処理はオブジェクトの評価で仕様として定義できる
+
+class CircleRecommendSpecification
+{
+    public function __construct(private readonly DateTime $executeDatetime)
+    {
+        $this->executeDatetime = $executeDatetime;
+    }
+
+    public function isSatisfiedBy(Circle $circle): bool
+    {
+        if ($circle->countMembers() < 10) return false;
+        return $circle->created() > $this->executeDatetime->modify("-1 month");
+    }
+}
+
+class CircleApplicationService
+{
+    private readonly ICircleRepository $circle_repository;
+    private readonly DateTime $now;
+
+    // ...略
+
+    public function getRecommend(CircleGetRecommendRequest $request): CircleGetRecommendResult
+    {
+        $recommend_circle_spec = new CircleRecommendSpecification($this->now);
+
+        $circles = $this->circle_repository->findAll();
+        $recommend_circles = $circles->where($recommend_circle_spec->isSatisfiedBy())->take(10)->toArray();
+
+        return new CircleGetRecommendResult($recommend_circles);
+    }
+}
