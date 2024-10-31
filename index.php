@@ -1491,3 +1491,109 @@ class UnitOfWork implements IUnitOfWork
 /**
  * Chapter13: Evaluation
  */
+
+namespace Evaluation;
+
+use Chapter2to7\IUserRepository;
+use DomainObject\ValueObject\Circle\CircleId;
+use Exception;
+use Repository\Circle\ICircleRepository;
+use UseCase\Circle\Command\CircleJoinCommand;
+
+// * ユーザーにはプレミアムユーザーと通常ユーザーがいる
+// * サークルの上限は30人まで
+// * しかし、プレミアムユーザーが10人以上いるサークルの上限は50人
+
+class CircleApplicationService
+{
+    private readonly ICircleRepository $circle_repository;
+    private readonly IUserRepository $user_repository;
+
+    // ...略
+
+    public function join(CircleJoinCommand $command): void
+    {
+        $circle_id = new CircleId($command->getCircleId());
+        $circle = $this->circle_repository->findById($circle_id);
+
+        $users = $this->user_repository->find($circle->getMembers());
+        // サークルに所属しているプレミアムユーザーの人数により上限が変わる
+        $premium_user_number = count(array_filter($users, function ($user) {
+            return $user->isPremium();
+        }));
+        $circle_upper_limit = $premium_user_number < 10 ? 30 : 50;
+        if ($circle->countMembers() >= $circle_upper_limit) {
+            throw new Exception("サークルの上限人数に達しています");
+        }
+
+        // ...略
+    }
+}
+
+// この実装ではドメインのルールがサービスに記述して、ドメインの重要なルールがサービスに散在してしまう
+// 次にCircleにルールを記述することを考える
+
+class Circle
+{
+    // プレミアムユーザーの人数を探したいが保持しているのはUserIdのコレクションだけだとする(phpは型がないので仮定)
+    public array $members;
+
+    // ...略
+
+    // ユーザーのリポジトリを受け取る？
+    public function isFull(IUserRepository $user_repository): bool
+    {
+        $users = $user_repository->find($this->members);
+        $premium_user_number = count(array_filter($users, function ($user) {
+            return $user->isPremium();
+        }));
+        $circle_upper_limit = $premium_user_number < 10 ? 30 : 50;
+        return $this->countMembers() >= $circle_upper_limit;
+    }
+}
+
+// リポジトリはドメイン由来のものではなく、Circleがドメインモデルの表現に徹していないため良くない実装
+// これを「仕様」により解決する
+
+class CircleFullSpecification
+{
+    public function __construct(private readonly IUserRepository $user_repository)
+    {
+        $this->user_repository = $user_repository;
+    }
+
+    public function isSatisfiedBy(Circle $circle): bool
+    {
+        $users = $this->user_repository->find($circle->getMembers());
+        $premium_user_number = count(array_filter($users, function ($user) {
+            return $user->isPremium();
+        }));
+        $circle_upper_limit = $premium_user_number < 10 ? 30 : 50;
+        return $circle->countMembers() >= $circle_upper_limit;
+    }
+}
+
+// この仕様オブジェクトを利用したときのアプリケーションサービスは以下のようになる
+
+class CircleApplicationService
+{
+    private readonly ICircleRepository $circle_repository;
+    private readonly IUserRepository $user_repository;
+
+    // ...略
+
+    public function join(CircleJoinCommand $command): void
+    {
+        $circle_id = new CircleId($command->getCircleId());
+        $circle = $this->circle_repository->findById($circle_id);
+
+        $circle_full_specification = new CircleFullSpecification($this->user_repository);
+        if ($circle_full_specification->isSatisfiedBy($circle)) {
+            throw new Exception("サークルの上限人数に達しています");
+        }
+
+        // ...略
+    }
+}
+
+// このように仕様オブジェクトを用意することで、複雑な評価手順はカプセル化され、コードの意図が明確になる
