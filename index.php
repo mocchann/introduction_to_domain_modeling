@@ -1657,3 +1657,36 @@ class CircleApplicationService
         return new CircleGetRecommendResult($recommend_circles);
     }
 }
+
+// サークル一覧を取得する処理
+class CircleApplicationService
+{
+    public function getSummaries(CircleGetSummariesCommand $command): CircleGetSummariesResult
+    {
+        $all = $this->circle_repository->findAll();
+        $circles = $all->skip(($command->getPage() - 1) * $command->getSize())->take($command->getSize());
+
+        $summaries = [];
+        foreach ($circles as $circle) {
+            // サークルのオーナーを改めて検索
+            $owner = $this->user_repository->find($circle->getOwnerId());
+            $summaries[] = new CircleSummaryData($circle->getId(), $owner->getName());
+        }
+
+        return new CircleGetSummariesResult($summaries);
+    }
+}
+
+// ↑は全件取得やループ内でfindしたり最適化には問題がある
+// 最適化のために直接クエリを実行する
+class CircleQueryService
+{
+    // ...略
+    public function getSummaries(CircleGetSummariesCommand $command): CircleGetsummariesResult
+    {
+        // ここで直接SQLを書いてクエリを実行...
+        $summaries = [];
+
+        return new CircleGetSummariesResult($summaries);
+    }
+}
