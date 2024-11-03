@@ -1,6 +1,6 @@
 <?php
 
-namespace LayeredArchitecture\Services;
+namespace LayeredArchitecture\Application;
 
 use Exception;
 use PDO;

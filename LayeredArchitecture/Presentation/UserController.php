@@ -1,6 +1,6 @@
 <?php
 
-namespace LayeredArchitecture\Controllers;
+namespace Presentation;
 
 class UserController extends Controller
 {
